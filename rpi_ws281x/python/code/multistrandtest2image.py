@@ -1,13 +1,8 @@
-# NeoPixel library strandtest example
-# Author: Tony DiCola (tony@tonydicola.com)
-#
-# Direct port of the Arduino NeoPixel library strandtest example.  Showcases
-# various animations on a strip of NeoPixels.
-
 #run with: sudo PYTHONPATH=".:build/lib.linux-armv7l-2.7" python examples/multistrandtest2image.py
 
 import time
 import numpy as np
+import gizeh as gz
 import imageio
 from neopixel import *
 from itertools import *
@@ -47,8 +42,10 @@ def blackout(strip):
 		strip.setPixelColor(i, Color(0,0,0))
 		strip.show()
 
+		
 # Main program logic follows:
 if __name__ == '__main__':
+	##SETUPPIXEL
 	# Create NeoPixel objects with appropriate configuration for each strip.
 	strip1 = Adafruit_NeoPixel(LED_1_COUNT, LED_1_PIN, LED_1_FREQ_HZ, LED_1_DMA, LED_1_INVERT, LED_1_BRIGHTNESS, LED_1_CHANNEL, LED_1_STRIP)
 	strip2 = Adafruit_NeoPixel(LED_2_COUNT, LED_2_PIN, LED_2_FREQ_HZ, LED_2_DMA, LED_2_INVERT, LED_2_BRIGHTNESS, LED_2_CHANNEL, LED_2_STRIP)
@@ -61,11 +58,31 @@ if __name__ == '__main__':
 	
 	# Black out any LEDs that may be still on for the last run
 	blackout(strip1)
-	blackout(strip2)
-	
-	imMap = imageio.imread('assets/240RGB.png') #imMap = np.int_(imMap)
-	imDraw = imageio.imread('assets/transparent_colors.png')
+	blackout(strip2)	
+	##settuppixel
 
+
+	L,W = 90,78
+	surface = gz.Surface(W,L, bg_color=(0,0,0))
+	radius = 50
+	centers = [ gz.polar2cart(40, angle) for angle in [0, 2*np.pi/3, 4*np.pi/3]]
+	colors = [ (1,0,0,.4), # <- Semi-tranparent red (R,G,B, transparency)
+			   (0,1,0,.4), # <- Semi-tranparent green
+			   (0,0,1,.4)] # <- Semi-tranparent blue
+	
+	circles = gz.Group( [ gz.circle(radius, xy=center, fill=color,
+									stroke_width=0, stroke=(0,0,0)) # black stroke
+						  for center, color in zip(centers, colors)] )
+
+	circles.translate([W/2,L/2]).draw(surface)
+
+	#surface.write_to_png("assets/draw.png")
+
+	#Mapcolours
+	imMap = imageio.imread('assets/240RGB.png') #imMap = np.int_(imMap)
+	#imDraw = imageio.imread('assets/draw.png')
+	imDraw = surface.get_npimage(False)
+	
 	maMap = np.ma.masked_where(imMap > 240, imMap, False)#Mask the Map and the Draw Canvas
 	maDraw = np.ma.masked_where(np.ma.getmask(maMap), imDraw, False)#False to not return a copy but work in place
 
@@ -74,9 +91,8 @@ if __name__ == '__main__':
 	compMapDraw = maMapDraw.compressed()#remove masked values
 	iterCMP = grouper(4, compMapDraw, 0)#turn into iterable chunks
 	
+	##DRAW
 	#while True:
-	global strip1
-	global strip2
 	
 	for data in iterCMP:
 		
@@ -86,10 +102,9 @@ if __name__ == '__main__':
 		g = data[3]
 		if id <= 120:
 			strip1.setPixelColor(int(id), Color(r, b, g))
-			print "id: {0} r: {1} b: {2} g: {3}".format(id, r, b, g)
 		else:
-			strip2.setPixelColor(int(id)-120, Color(r, b, g))
-			#strip2.setPixelColor(id , Color(r, b, g))
+			strip2.setPixelColor(120-(int(id)-120), Color(r, b, g))
+		#print "id: {0} r: {1} b: {2} g: {3}".format(id, r, b, g)
 	strip1.show()
 	strip2.show()
 	
