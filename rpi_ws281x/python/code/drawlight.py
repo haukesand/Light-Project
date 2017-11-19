@@ -11,25 +11,40 @@ topY, bottomY = 0, H
 duration = 2  # duration of the clip, in seconds
 fps = 15
 surface = gz.Surface(W, H, bg_color=(0, 0, 0))
+_is_running = True
+message = "nomessage"
 
 class animation:
-	instances = []
-	def __init__(self, name=None):
-		self.__class__.instances.append(weakref.proxy(self))
-		self.name = name
-		self.start_time = start_time
-		self.last_loop_time = last_loop_time
-		self.animation_duration = animation_duration
-		self.loop_amount = loop_amount
-		self.loop_time = loop_time
-		self.always_loop = always_loop
-		self.strength_percentage = strength_percentage
-		self.strength_value = strength_value
-		self.angle = angle
+    instances = []
+    def __init__(self, name=None):
+        self.__class__.instances.append(weakref.proxy(self))
+        self.name = name
+        self.start_time = start_time
+        self.last_loop_time = last_loop_time
+        self.animation_duration = animation_duration
+        self.loop_amount = loop_amount
+        self.loop_time = loop_time
+        self.always_loop = always_loop
+        self.strength_percentage = strength_percentage
+        self.strength_value = strength_value
+        self.angle = angle
 
 def draw():
-	while True:
-		make_frame(t)
+
+        while (_is_running):
+            try:
+                # make_frame(t)
+                print message
+                time.sleep(1)
+            except KeyboardInterrupt:
+                stop()
+                print "\nInterrupted from Keyboard interrupt in draw loop"
+                pass
+def println(message):
+    message = message
+
+def stop():
+  _is_running = False
 
 def make_frame(t):
     # reset background
@@ -150,5 +165,5 @@ def rgb_color_alpha(*colors):
     return r, g, b, a
 
 
-clip = mpy.VideoClip(make_frame, duration=duration)
-clip.write_gif("circle.gif", fps=fps, opt="OptimizePlus", fuzz=10)
+# clip = mpy.VideoClip(make_frame, duration=duration)
+#  clip.write_gif("circle.gif", fps=fps, opt="OptimizePlus", fuzz=10)

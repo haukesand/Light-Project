@@ -1,8 +1,8 @@
 # Adapted from Abraboxabra 1.0 Piero
 
 from bluetooth import *
-import drawlight
-import threading
+import drawlightclass
+#import threading
 import time
 # Setup the bluetooth connection
 
@@ -21,28 +21,34 @@ advertise_service(server_sock, "SampleServer",
                   #                   protocols = [ OBEX_UUID ]
                   )
 
-threading.Thread(target=make_frame).start()
+
 
 print ("Waiting for connection on RFCOMM channel %d" % port)
+try:
+    drawNow = drawlightclass.Draw()
+    client_sock, client_info = server_sock.accept()
+    print ("Accepted Bluetooth connection from ", client_info)
 
-client_sock, client_info = server_sock.accept()
-print ("Accepted Bluetooth connection from ", client_info)
+    while True:
+        try:
+            data = client_sock.recv(1024)
+            print("received command %s" % data)
+            if data.startswith('<') and data.endswith('>'):
+                splitted = data[1:-1].split(',')
+                lightfunction = splitted[0]
+                drawNow.changeMessage(lightfunction)
 
-while True:
-    try:
-        data = client_sock.recv(1024)
-        print("received command %s" % data)
-        if data.startswith('<') and data.endswith('>'):
-            splitted = data[1:-1].split(',')
-            lightfunction = splitted[1]
-            multi_strip_light_through
+        except IOError:
+            client_sock, client_info = server_sock.accept()
+            print("Accepted Bluetooth connection from ", client_info)
+            pass
+        
+    client_sock.close()
+    server_sock.close()
+
+except KeyboardInterrupt:
+    drawNow.stop()
+    print "\nInterrupted from Keyboard interrupt in receive"
+    pass  
 
 
-
-    except IOError:
-        client_sock, client_info = server_sock.accept()
-        print("Accepted Bluetooth connection from ", client_info)
-        pass
-
-client_sock.close()
-server_sock.close()
