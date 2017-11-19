@@ -32,8 +32,7 @@ while True:
     try:
         data = client_sock.recv(1024)
         print("received command %s" % data)
-        if data.startswith('<') && data.endswith('>'):
-            print("openclose")
+        if data.startswith('<') and data.endswith('>'):
             splitted = data[1:-1].split(',')
             lightfunction = splitted[1]
             multi_strip_light_through

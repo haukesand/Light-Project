@@ -6,3 +6,4 @@ newtest
 *.o
 *.a
 *.swp
+.idea
