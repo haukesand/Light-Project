@@ -1,0 +1,21 @@
+sudo hciconfig hci0 up # bluetooth interface
+
+sudo hciconfig hci0 piscan # discoverability
+
+sudo systemctl enable bluetooth.service
+
+sudo service bluetooth start
+
+bluetoothctl
+
+discoverable on
+pairable on
+agent on
+
+# [NEW] Controller B8:27:EB:4B:CF:F7 raspberrypi [default]
+# [NEW] Device CC:F3:A5:C1:89:54 Nextbit Robin
+# [NEW] Device 00:04:4B:61:8B:6B SHIELD Tablet K1
+
+pair CC:F3:A5:C1:89:54
+
+sudo python receive.py
