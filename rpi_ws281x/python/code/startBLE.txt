@@ -19,3 +19,9 @@ agent on
 pair CC:F3:A5:C1:89:54
 
 sudo python receive.py
+
+
+#Set time
+sudo date --set '2017-11-27 10:05:00'
+# Set time zone 
+sudo sudo dpkg-reconfigure tzdata

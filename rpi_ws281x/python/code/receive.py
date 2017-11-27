@@ -34,9 +34,26 @@ try:
             data = client_sock.recv(1024)
             print("received command %s" % data)
             if data.startswith('<') and data.endswith('>'):
+                light_type, always_loop, loop_time, loop_amount, strength_percentage, strength_value, angle  = [None] * 7
                 splitted = data[1:-1].split(',')
-                lightfunction = splitted[0]
-                drawNow.changeMessage(lightfunction)
+                light_type = splitted[0]
+                for item in splitted[1:]:
+                    if item.startswith('loop'): 
+                        loop_value = item[5:]
+                        if "." in loop_value:
+                            loop_time = loop_value
+                        elif loop_value == "INF":
+                            always_loop = True
+                        elif loop_value == "OFF":
+                            drawNow.off_animation(light_type = light_type)
+                            pass
+                        else:
+                            loop_amount = loop_value
+                    if item.startswith('strength'):
+                        print item[9:]
+                    if item.startswith('angle'): 
+                        print item[6:]
+                drawNow.new_animation(light_type=light_type, always_loop=always_loop, loop_time = loop_time, loop_amount=loop_amount, strength_percentage=strength_percentage, strength_value=strength_value, angle=angle)
 
         except IOError:
             client_sock, client_info = server_sock.accept()

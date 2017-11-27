@@ -4,6 +4,8 @@ import math
 import easing
 import time
 import threading
+import weakref
+
 
 W, H = 78, 90  # width, height, in pixels
 halfW, halfH = W / 2, H / 2
@@ -12,15 +14,16 @@ topY, bottomY = 0, H
 duration = 2  # duration of the clip, in seconds
 fps = 15
 surface = gz.Surface(W, H, bg_color=(0, 0, 0))
+animation_list = []
 
 class animation:
-    instances = []
-    def __init__(self, name=None):
-        self.__class__.instances.append(weakref.proxy(self))
-        self.name = name
-        self.start_time = start_time
-        self.last_loop_time = last_loop_time
-        self.animation_duration = animation_duration
+    # instances = []
+    def __init__(self, light_type=None, always_loop=None, loop_time = None, loop_amount=None, strength_percentage=None, strength_value=None, angle=None):
+        # self.__class__.instances.append(weakref.proxy(self))
+        self.type = light_type
+        # self.start_time = start_time
+        # self.last_loop_time = last_loop_time
+        # self.animation_duration = animation_duration
         self.loop_amount = loop_amount
         self.loop_time = loop_time
         self.always_loop = always_loop
@@ -46,20 +49,37 @@ class Draw(object):
         while (self._is_running):
             try:
                 # make_frame(t)
-                print self.message
+                # print self.message
+                for cur_animation in animation_list:
+                    print(cur_animation.type)
+                
                 time.sleep(1)
             except KeyboardInterrupt:
                 stop()
                 print "\nInterrupted from Keyboard interrupt in draw loop"
                 pass
                 
+                
     def changeMessage(self, message):
         self.message = message
-
+        
+        
+    def new_animation(self, light_type = None, always_loop = False, loop_amount = None, loop_time = None, strength_percentage = None, strength_value = None, angle=None):
+        if loop_amount is not None:
+            animation_list.append(animation(light_type = light_type, loop_amount=loop_amount, angle=angle ))
+        elif always_loop is not None:
+             animation_list.append(animation(light_type = light_type, always_loop=always_loop, angle=angle ))
+             
+             
+    def off_animation(self, light_type = None):
+        print "Infinite animation should be off"
+        
+        
     def stop(self):
       self._is_running = False
       print "\nStopped drawing"
 
+      
     def make_frame(t):
         # reset background
         background = gz.rectangle(xy=(halfW, halfH), lx=W,
