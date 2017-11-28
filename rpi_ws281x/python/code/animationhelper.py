@@ -11,6 +11,8 @@ duration = 2  # duration of the clip, in seconds
 fps = 15
 surface = gz.Surface(W, H, bg_color=(0, 0, 0))
 
+# TODO Defaults for the function calls
+
 def background():
     background = gz.rectangle(xy=(halfW, halfH), lx=W,
                               ly=H, fill=rgb_color_alpha(0, 0, 0, 1))
@@ -43,7 +45,7 @@ def strip_light_through(t, angle, thickness, color):
                         ly=H, fill=gradient).rotate(angle, center=(halfW, halfH)).translate(center)
     rect.draw(surface)
 
-def light_rotate_around(t, angle, thickness, direction, color):
+def light_rotate_around(t, angle, thickness, direction = 1, color):
 
     strength = easing.easeOutQuart(t, 0.0, 1.0, duration / 2)
     angle = angle + 2 * math.pi * (t / duration) * direction
@@ -84,15 +86,15 @@ def point_light_grow_shrink(t, size, xy, color):
     circle = gz.circle(r=radius / 2, fill=gradient).translate(xy=xy)
     circle.draw(surface)
 
-def point_light_through(t, side, color):
+def point_light_through(t, size, posx, color):
     y = (-H / 5) + (5 * H / 3) * (t / duration)
     gradient = gz.ColorGradient(type="radial",
                                 stops_colors=[
                                     (0, color), (1, (0, 0, 0, 0))],
                                 xy1=[0, 0],
                                 xy2=[0, 0],
-                                xy3=[0, halfW])
-    circle = gz.circle(r=halfW, fill=gradient).translate(xy=(side, y))
+                                xy3=[0, size]) # size was halfW
+    circle = gz.circle(r=size, fill=gradient).translate(xy=(side, y))
     circle.draw(surface)
 
 # def rgb_color_alpha(red, green, blue, alpha):

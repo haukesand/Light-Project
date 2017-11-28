@@ -84,6 +84,7 @@ def light_rotate_around(t, angle, thickness, direction, color):
 
 
 def flank_light_pulse(t, xy1, xy2, color):
+    # this is not sharing friendly yet
     if t < .5:
         strength = easing.easeOutQuart(t, 0.0, 1.0, duration / 2)
     else:

@@ -1,0 +1,49 @@
+## MESSAGES ##
+<"start_moving",loop=1,angle=180>
+
+<"move_backwards",loop=INF,angle=180>
+<move_backwards,loop=OFF>
+
+<"lane_left",loop=1>
+<"lane_right",loop=1>
+
+<"depart_todestination",loop=1>
+<"arrive_destination",loop=1>
+
+# <"slow_down",loop=INF>
+# <slow_down,loop=OFF>
+
+<"speed_up",loop=INF,strength=50,angle=180>
+<speed_up,loop=OFF>
+
+<"turn_left",loop=INF>
+<turn_left,loop=OFF>
+
+<"turn_right",loop=INF>
+<turn_right,loop=OFF>
+
+<"highway_enter",loop=3.0>
+<"highway_leave",loop=3.0>
+
+<"wait_trafficlight",loop=INF>
+<wait_trafficlight,loop=OFF>
+
+<"wait_pedestrian",loop=INF>
+<wait_pedestrian,loop=OFF>
+
+<"uneven_road",loop=INF>
+<uneven_road,loop=OFF>
+
+<"swerve_left",loop=1>
+
+<"brake_now",loop=1,strength=50>
+
+<"speed_keep",loop=INF,strength=75>
+
+## FUNCTIONS##
+def multi_strip_light_through(t, angle, thickness, color):
+def strip_light_through(t, angle, thickness, color):
+def light_rotate_around(t, angle, thickness, direction, color):
+def flank_light_pulse(t, xy1, xy2, color):
+def point_light_grow_shrink(t, size, xy, color): turn_left / turn_right
+def point_light_through(t, size, posx, color):
