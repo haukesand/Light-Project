@@ -7,10 +7,8 @@ import weakref
 import send
 animation_list = []
 
-
 class animation:
     instances = []
-    surface = None
     def __init__(self, light_type=None, always_loop=None, loop_time=None, loop_amount=None, strength=None, angle=None):
         self.__class__.instances.append(weakref.proxy(self))
         self.type = light_type
@@ -21,65 +19,69 @@ class animation:
         self.strength = strength
         self.angle = angle
 
-        # self.start_time = start_time
-        # self.last_loop_time = last_loop_time
+        self.duration = 2  # duration of the clip, in seconds
 
         # self.animation_duration = animation_duration
         if self.type == "turn_left":
             self.color = ah.rgb_color_alpha(253, 215, 15, .5)
             self.position = (15, 30)
             self.size = 140
-            self.time = 0
+            self.time = 0.0
+            self.duration = 2.0  # duration of the clip, in seconds
+
             # self.function = point_light_grow_shrink()
 
 
 class Draw(object):
     def __init__(self):
         self._is_running = True
+        self.last_frame = None # numpy array of animations
+
         thread = threading.Thread(target=self.draw, args=())
         thread.daemon = True                            # Daemonize thread
         thread.start()                                  # Start the execution
 
     def draw(self):
-        
+        last_loop_time = time.time()  
         while (self._is_running):
-            try:
-                # make_frame(t)
+           
+            # make_frame(t)
 
-                toDelete = None
+            start_loop_time = time.time()
+            loop_delta = start_loop_time - last_loop_time
+            print loop_delta
+            toDelete = None # mark which object should be deleted
+            ah.background() # clear background
 
-                ah.background()
-                for index, cur_animation in enumerate(animation_list, start=0):
-                    if cur_animation.type == "turn_left":
-                        ah.point_light_grow_shrink(
-                            cur_animation.time, cur_animation.size, cur_animation.position, cur_animation.color)
+            for index, cur_animation in enumerate(animation_list, start=0):
+                if cur_animation.type == "turn_left":
+                    ah.point_light_grow_shrink(
+                        cur_animation.time, cur_animation.size, cur_animation.position, cur_animation.color)
 
-                    # Here stuff is going to happen
-                    # TODO create light patterns each make_frame
-                    # TODO iterate through light patterns until death
-                    # TODO fade light patterns in & out
 
-                    if cur_animation.always_loop == False:
-                        # TODO Implement Fadout
-                        toDelete = index
-                        print cur_animation.type + ": is deleted"
+                if cur_animation.always_loop == False:
+                    # TODO Implement Fadout
+                    toDelete = index
+                    print cur_animation.type + ": is deleted"
 
-                    cur_animation.time += 0.06
-                    if cur_animation.time > duration:
-                        cur_animation.time = 0
+                cur_animation.time += loop_delta
+                if cur_animation.time >= cur_animation.duration:
+                    cur_animation.time = 0.0
 
-                if toDelete is not None:  # turn off one animation each iteration
-                    del animation_list[toDelete]
-                    # print len(animation_list)
+            if toDelete is not None:  # turn off one animation each iteration
+                del animation_list[toDelete]
+                # print len(animation_list)
 
-                surface = ah.getSurface()
-                print np.amax(surface)
+            self.last_frame = ah.getSurface()
+            # print np.amax(self.last_frame)
 
-                time.sleep(1)
-            except KeyboardInterrupt:
-                stop()
-                print "\nInterrupted from Keyboard interrupt in draw loop"
-                pass
+
+            last_loop_time = time.time() 
+            time.sleep(0.001)
+            
+
+
+        
 
     def new_animation(self, light_type=None, always_loop=False, loop_amount=None, loop_time=None, strength=None, angle=None):
         animation_list.append(animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time,
@@ -104,3 +106,6 @@ class Draw(object):
     def stop(self):
         self._is_running = False
         print "\nStopped drawing"
+
+    def get_last_frame(self):
+        return self.last_frame

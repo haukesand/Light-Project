@@ -37,7 +37,7 @@ LED_2_STRIP = ws.SK6812_STRIP_GRBW
 duration = 2  # duration of the clip, in seconds
 
 class Send(object):
-    def __init__(self):
+    def __init__(self, animation):
         self.H,self.W = 90,78
         self.position = 0
         self.surface = gz.Surface(self.W,self.H, bg_color=(0,0,0))
@@ -49,6 +49,7 @@ class Send(object):
         self.strip2 = Adafruit_NeoPixel(LED_2_COUNT, LED_2_PIN, LED_2_FREQ_HZ,
                                    LED_2_DMA, LED_2_INVERT, LED_2_BRIGHTNESS, LED_2_CHANNEL, LED_2_STRIP)
         self._is_running = True
+        self.animation = animation
 
         thread = threading.Thread(target=self.send, args=())
         thread.daemon = True                            # Daemonize thread
@@ -56,7 +57,6 @@ class Send(object):
         
     
     def send(self):
-
         # Intialize the library (must be called once before other functions).
         self.strip1.begin()
         self.strip2.begin()
@@ -71,11 +71,13 @@ class Send(object):
 
         while (self._is_running):
             # Mapcolours
-            imDraw = self.make_frame(self.t)
+            # imDraw = self.make_frame(self.t)
+            # self.t += 0.06
+            # if self.t > duration:
+            #     self.t = 0
+            imDraw = self.animation.get_last_frame()    
             maDraw = np.ma.masked_where(np.ma.getmask(maMap), imDraw, False)
-            self.t += 0.06
-            if self.t > duration:
-                self.t = 0
+
             # remove any additional g & b information but keep dimensionality
             maMapDraw = np.ma.concatenate((maMap[:, :, [0]], maDraw), axis=2)
             compMapDraw = maMapDraw.compressed()  # remove masked values
