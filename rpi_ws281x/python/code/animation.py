@@ -4,20 +4,13 @@ import threading
 import gizeh as gz
 import numpy as np
 import weakref
-
-W, H = 78, 90  # width, height, in pixels
-halfW, halfH = W / 2, H / 2
-leftX, rightX = 0, W
-topY, bottomY = 0, H
-duration = 2  # duration of the clip, in seconds
-fps = 15
-surface = gz.Surface(W, H, bg_color=(0, 0, 0))
+import send
 animation_list = []
 
 
 class animation:
     instances = []
-
+    surface = None
     def __init__(self, light_type=None, always_loop=None, loop_time=None, loop_amount=None, strength=None, angle=None):
         self.__class__.instances.append(weakref.proxy(self))
         self.type = light_type
@@ -48,6 +41,7 @@ class Draw(object):
         thread.start()                                  # Start the execution
 
     def draw(self):
+        
         while (self._is_running):
             try:
                 # make_frame(t)
@@ -78,7 +72,8 @@ class Draw(object):
                     del animation_list[toDelete]
                     # print len(animation_list)
 
-                print np.amax(ah.getSurface())
+                surface = ah.getSurface()
+                print np.amax(surface)
 
                 time.sleep(1)
             except KeyboardInterrupt:
@@ -104,7 +99,7 @@ class Draw(object):
         for one_animation in animation_list:
             if one_animation.type == light_type:
                 one_animation.always_loop = False
-                print one_animation.type + ": Turned off"
+                print one_animation.type + ": Turning off"
 
     def stop(self):
         self._is_running = False

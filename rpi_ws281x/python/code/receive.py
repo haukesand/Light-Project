@@ -2,6 +2,7 @@
 
 from bluetooth import *
 import animation
+import send
 #import threading
 import time
 # Setup the bluetooth connection
@@ -24,7 +25,8 @@ advertise_service(server_sock, "SampleServer",
 
 print ("Waiting for connection on RFCOMM channel %d" % port)
 try:
-    drawNow = animation.Draw()
+    # drawNow = animation.Draw()
+    sendNow = send.Send()
     client_sock, client_info = server_sock.accept()
     print ("Accepted Bluetooth connection from ", client_info)
 
@@ -61,10 +63,11 @@ try:
                         # drawNow.new_animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time, loop_amount=loop_amount,
                         #                       strength = strength, angle=angle)
                 if always_loop is not False:
-                    drawNow.new_animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time, loop_amount=loop_amount,
-                                      strength = strength, angle=angle)
+                    print "Draw is disabled"
+                    # drawNow.new_animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time, loop_amount=loop_amount, strength = strength, angle=angle)
                 else:
-                    drawNow.off_animation(light_type=light_type)
+                    print "Draw is disabled"
+                    # drawNow.off_animation(light_type=light_type)
 
         except IOError:
             client_sock, client_info = server_sock.accept()
@@ -75,6 +78,7 @@ try:
     server_sock.close()
 
 except KeyboardInterrupt:
-    drawNow.stop()
+    # drawNow.stop()
+    sendNow.stop()
     print "\nInterrupted from Keyboard interrupt in receive"
     pass
