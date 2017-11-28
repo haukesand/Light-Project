@@ -11,6 +11,14 @@ duration = 2  # duration of the clip, in seconds
 fps = 15
 surface = gz.Surface(W, H, bg_color=(0, 0, 0))
 
+def background():
+    background = gz.rectangle(xy=(halfW, halfH), lx=W,
+                              ly=H, fill=rgb_color_alpha(0, 0, 0, 1))
+    background.draw(surface)
+
+def getSurface():
+    return surface.get_npimage()
+
 def multi_strip_light_through(t, angle, thickness, color):
     angle += math.radians(90)  # to start animation from front
 
