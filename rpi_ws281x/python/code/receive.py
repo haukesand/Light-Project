@@ -1,7 +1,7 @@
 # Adapted from Abraboxabra 1.0 Piero
 
 from bluetooth import *
-import drawlightclass
+import animation
 #import threading
 import time
 # Setup the bluetooth connection
@@ -24,7 +24,7 @@ advertise_service(server_sock, "SampleServer",
 
 print ("Waiting for connection on RFCOMM channel %d" % port)
 try:
-    drawNow = drawlightclass.Draw()
+    drawNow = animation.Draw()
     client_sock, client_info = server_sock.accept()
     print ("Accepted Bluetooth connection from ", client_info)
 
@@ -45,16 +45,26 @@ try:
                         elif loop_value == "INF":
                             always_loop = True
                         elif loop_value == "OFF":  # turn the animation off
-                            drawNow.off_animation(light_type=light_type)
-                            pass
+                            #drawNow.off_animation(light_type=light_type)
+                            always_loop = False
+                            break
                         else:
                             loop_amount = loop_value
+                        # drawNow.new_animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time, loop_amount=loop_amount,
+                        #                       strength = strength, angle=angle)
                     elif item.startswith('strength'):
                         strength = item[9:]
+                        # drawNow.new_animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time, loop_amount=loop_amount,
+                        #                       strength = strength, angle=angle)
                     elif item.startswith('angle'):
                         angle = item[6:]
-                drawNow.new_animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time, loop_amount=loop_amount,
+                        # drawNow.new_animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time, loop_amount=loop_amount,
+                        #                       strength = strength, angle=angle)
+                if always_loop is not False:
+                    drawNow.new_animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time, loop_amount=loop_amount,
                                       strength = strength, angle=angle)
+                else:
+                    drawNow.off_animation(light_type=light_type)
 
         except IOError:
             client_sock, client_info = server_sock.accept()
