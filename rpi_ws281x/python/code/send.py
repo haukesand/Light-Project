@@ -15,7 +15,7 @@ LED_1_COUNT = 120      # Number of LED pixels.
 LED_1_PIN = 13
 LED_1_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
 # DMA channel to use for generating signal (Between 1 and 14)
-LED_1_DMA = 5
+LED_1_DMA = 10
 LED_1_BRIGHTNESS = 20     # Set to 0 for darkest and 255 for brightest
 # True to invert the signal (when using NPN transistor level shift)
 LED_1_INVERT = False
@@ -98,7 +98,7 @@ class Send(object):
         self._is_running = False
         self.blackout(self.strip1, self.strip2)
         print "\nStopped sending"
-        sys.exit
+        sys.exit(0)
 
     def blackout(self, strip1, strip2):
         for i in range(LED_1_COUNT):
