@@ -13,13 +13,16 @@ surface = gz.Surface(W, H, bg_color=(0, 0, 0))
 
 # TODO Defaults for the function calls
 
+
 def background():
     background = gz.rectangle(xy=(halfW, halfH), lx=W,
                               ly=H, fill=rgb_color_alpha(0, 0, 0, 1))
     background.draw(surface)
 
+
 def getSurface():
     return surface.get_npimage()
+
 
 def multi_strip_light_through(t, angle, thickness, color):
     angle += math.radians(90)  # to start animation from front
@@ -34,6 +37,7 @@ def multi_strip_light_through(t, angle, thickness, color):
                             ly=H, fill=gradient).rotate(angle, center=(halfW, halfH)).translate(center)
         rect.draw(surface)
 
+
 def strip_light_through(t, angle, thickness, color):
     angle += math.radians(90)  # to start animation from front
     center = (gz.polar2cart((H * 2 * t / duration) - H, angle))
@@ -44,6 +48,7 @@ def strip_light_through(t, angle, thickness, color):
     rect = gz.rectangle(xy=(halfW, halfH), lx=thickness,
                         ly=H, fill=gradient).rotate(angle, center=(halfW, halfH)).translate(center)
     rect.draw(surface)
+
 
 def light_rotate_around(t, angle, thickness, direction, color):
 
@@ -57,6 +62,7 @@ def light_rotate_around(t, angle, thickness, direction, color):
                         ly=thickness, fill=gradient).rotate(angle, center=(halfW, halfH))
     rect.draw(surface)
 
+
 def flank_light_pulse(t, xy1, xy2, color):
     if t < .5:
         strength = easing.easeOutQuart(t, 0.0, 1.0, duration / 2)
@@ -68,6 +74,7 @@ def flank_light_pulse(t, xy1, xy2, color):
 
     rect = gz.rectangle(xy=(halfW, halfH), lx=W, ly=H, fill=gradient)
     rect.draw(surface)
+
 
 def point_light_grow_shrink(t, size, xy, color):
     # radius = W * (1 + (t * (duration - t)) ** 2) / 6
@@ -86,6 +93,7 @@ def point_light_grow_shrink(t, size, xy, color):
     circle = gz.circle(r=radius / 2, fill=gradient).translate(xy=xy)
     circle.draw(surface)
 
+
 def point_light_through(t, size, posx, color):
     y = (-H / 5) + (5 * H / 3) * (t / duration)
     gradient = gz.ColorGradient(type="radial",
@@ -93,12 +101,13 @@ def point_light_through(t, size, posx, color):
                                     (0, color), (1, (0, 0, 0, 0))],
                                 xy1=[0, 0],
                                 xy2=[0, 0],
-                                xy3=[0, size]) # size was halfW
-    circle = gz.circle(r=size, fill=gradient).translate(xy=(side, y))
+                                xy3=[0, size])  # size was halfW
+    circle = gz.circle(r=size, fill=gradient).translate(xy=(posx, y))
     circle.draw(surface)
 
 # def rgb_color_alpha(red, green, blue, alpha):
 #     return red / 255.0, green / 255.0, blue / 255.0, alpha
+
 
 def rgb_color_alpha(*colors):
     if len(colors) == 1:

@@ -31,40 +31,43 @@ try:
     print ("Accepted Bluetooth connection from ", client_info)
     sendNow = send.Send(drawNow)
 
-
     while True:
         try:
             data = client_sock.recv(1024)
             print("received command %s" % data)
             if data.startswith('<') and data.endswith('>'):
-                light_type, always_loop, loop_time, loop_amount, strength, angle = [None] * 6
+                light_type, always_loop, loop_time, loop_amount, strength, angle = [
+                    None] * 6
                 splitted = data[1:-1].split(',')
                 light_type = splitted[0]
                 for item in splitted[1:]:
                     if item.startswith('loop'):
                         loop_value = item[5:]
                         if "." in loop_value:
-                            loop_time = loop_value
+                            loop_time = float(loop_value)
                         elif loop_value == "INF":
                             always_loop = True
                         elif loop_value == "OFF":  # turn the animation off
                             # drawNow.off_animation(light_type=light_type)
                             always_loop = False
                             break
+                        elif loop_value == "ONE":  # turn the animation off
+                            loop_amount = 1
                         else:
-                            loop_amount = loop_value
+                            loop_amount = int(loop_value)
                         # drawNow.new_animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time, loop_amount=loop_amount,
                         #                       strength = strength, angle=angle)
                     elif item.startswith('strength'):
-                        strength = item[9:]
+                        strength = float(item[9:])
                         # drawNow.new_animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time, loop_amount=loop_amount,
                         #                       strength = strength, angle=angle)
                     elif item.startswith('angle'):
-                        angle = item[6:]
+                        angle = float(item[6:])
                         # drawNow.new_animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time, loop_amount=loop_amount,
                         #                       strength = strength, angle=angle)
                 if always_loop is not False or always_loop is None:
-                    drawNow.new_animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time, loop_amount=loop_amount, strength = strength, angle=angle)
+                    drawNow.new_animation(light_type=light_type, always_loop=always_loop,
+                                          loop_time=loop_time, loop_amount=loop_amount, strength=strength, angle=angle)
                 else:
                     drawNow.off_animation(light_type=light_type)
 
