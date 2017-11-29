@@ -45,7 +45,7 @@ def strip_light_through(t, angle, thickness, color):
                         ly=H, fill=gradient).rotate(angle, center=(halfW, halfH)).translate(center)
     rect.draw(surface)
 
-def light_rotate_around(t, angle, thickness, direction = 1, color):
+def light_rotate_around(t, angle, thickness, direction, color):
 
     strength = easing.easeOutQuart(t, 0.0, 1.0, duration / 2)
     angle = angle + 2 * math.pi * (t / duration) * direction

@@ -38,74 +38,74 @@ class animation:
             self.function = "strip_light_through"
             self.color = ah.rgb_color_alpha(0, 191, 255, .5)
             self.thickness = H / 3
-        elif self.type == "move_backwards" 
+        elif self.type == "move_backwards":
             self.function = "strip_light_through"
             self.color = ah.rgb_color_alpha(135, 206, 235, .5)
             self.thickness = H / 4
             self.angle = self.angle -180
-        elif self.type == "lane_left"
+        elif self.type == "lane_left":
             self.function = "point_light_through"
             self.posx = 0
             self.size = ah.halfW
             self.color = ah.rgb_color_alpha(255,255,240,.5)
-        elif self.type == "lane_right"
+        elif self.type == "lane_right":
             self.function = "point_light_through"
             self.posx = ah.W
             self.size = ah.halfW
             self.color = ah.rgb_color_alpha(255,255,240,.5)
-        elif self.type == "depart_todestination"
+        elif self.type == "depart_todestination":
             self.angle == 0
             self.function = "light_rotate_around"
             self.color = ah.rgb_color_alpha(127,255,212, .5)
             self.thickness = H
             self.direction = 1
-        elif self.type == "arrive_destination"
+        elif self.type == "arrive_destination":
             self.angle == 0
             self.function = "light_rotate_around"
             self.color = ah.rgb_color_alpha(127,255,212, .5)
             self.thickness = H
             self.direction = 1
         # elif self.type == "slow_down"
-        elif self.type == "speed_up" # TODO use strength for either speed of animation or visibility
+        elif self.type == "speed_up": # TODO use strength for either speed of animation or visibility
             self.function = "multi_strip_light_through"
             self.color = ah.rgb_color_alpha(135,206,250, .5)
             self.thickness = H / 3
-        elif self.type == "highway_enter"
+        elif self.type == "highway_enter":
             self.angle = -45
             self.function = "multi_strip_light_through"
             self.color = ah.rgb_color_alpha(255,215,0, .5)
             self.thickness = H / 3
-        elif self.type == "highway_leave"
+        elif self.type == "highway_leave":
             self.angle = 45
             self.function = "multi_strip_light_through"
             self.color = ah.rgb_color_alpha(255,215,0, .5)
             self.thickness = H / 3
-        elif self.type == "wait_trafficlight"
+        elif self.type == "wait_trafficlight":
             self.function = "point_light_grow_shrink"
             self.color = ah.rgb_color_alpha(144,238,144, .5)
             self.position = (ah.halfW, ah.halfH)
             self.size = ah.H
-        elif self.type == "wait_pedestrian"
+        elif self.type == "wait_pedestrian":
             self.function = "point_light_grow_shrink" 
             self.color = ah.rgb_color_alpha(255,165,0, .5)
             self.position = (ah.halfW, ah.halfH)
             self.size = ah.H
-        elif self.type == "uneven_road" # Needs a special animation type to "rattle"
+        elif self.type == "uneven_road": # Needs a special animation type to "rattle"
             self.function = "multi_strip_light_through"
             self.angle = 0
             self.color = ah.rgb_color_alpha(184,134,11, .5)
             self.thickness = H / 3
-        elif self.type == "swerve_left"
+        elif self.type == "swerve_left":
             self.function = "flank_light_pulse"
             self.xy1=(halfW, 0)
             self.xy2=(-rightX, 0)
             self.color = ah.rgb_color_alpha(220,20,60, .01 * strength)
-        elif self.type == "brake_now"
+        elif self.type == "brake_now":
             self.function = "flank_light_pulse"
             self.xy1=(0, -halfH)
             self.xy2=(0, bottomY)
             self.color = ah.rgb_color_alpha(220,20,60, .8)
-        elif self.type == "speed_keep" # TODO use strength for either speed of animation or visibility
+        elif self.type == "speed_keep": # TODO use strength for either speed of animation or visibility
             self.function = "multi_strip_light_through"
             self.color = ah.rgb_color_alpha(255,248,220, .5)
             self.thickness = H / 3.
@@ -120,6 +120,7 @@ class Draw(object):
         thread.daemon = True                            # Daemonize thread
         thread.start()                                  # Start the execution
 
+        print "Start animation thread"
     def draw(self):
         last_loop_time = time.time()  
         while (self._is_running):
@@ -144,7 +145,7 @@ class Draw(object):
                     ah.strip_light_through(cur_animation.time, cur_animation.angle, cur_animation.thickness, cur_animation.color)
                 elif cur_animation.function == "light_rotate_around":
                     ah.light_rotate_around(cur_animation.time, cur_animation.angle, cur_animation.thickness, cur_animation.direction, cur_animation.color)
-                elif cur_animation.function == "flank_light_pulse"
+                elif cur_animation.function == "flank_light_pulse":
                     ah.flank_light_pulse(cur_animation.time, cur_animation.xy1, cur_animation.xy2, cur_animation.color)
 
                 if cur_animation.always_loop == False:

@@ -1,6 +1,6 @@
 
 # run with: sudo PYTHONPATH=".:build/lib.linux-armv7l-2.7" python examples/multistrandtest2image.py
-
+import sys
 import time
 import numpy as np
 import gizeh as gz
@@ -54,7 +54,9 @@ class Send(object):
         thread = threading.Thread(target=self.send, args=())
         thread.daemon = True                            # Daemonize thread
         thread.start()                                  # Start the execution
-        
+  
+        print "Start send thread"
+
     
     def send(self):
         # Intialize the library (must be called once before other functions).
@@ -70,11 +72,6 @@ class Send(object):
 
 
         while (self._is_running):
-            # Mapcolours
-            # imDraw = self.make_frame(self.t)
-            # self.t += 0.06
-            # if self.t > duration:
-            #     self.t = 0
             imDraw = self.animation.get_last_frame()    
             maDraw = np.ma.masked_where(np.ma.getmask(maMap), imDraw, False)
 
@@ -101,6 +98,7 @@ class Send(object):
         self._is_running = False
         self.blackout(self.strip1, self.strip2)
         print "\nStopped sending"
+        sys.exit
 
     def blackout(self, strip1, strip2):
         for i in range(LED_1_COUNT):
