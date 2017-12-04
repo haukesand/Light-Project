@@ -24,8 +24,8 @@ def getSurface():
     return surface.get_npimage()
 
 
-def multi_strip_light_through(t, angle, thickness, color):
-    angle += math.radians(90)  # to start animation from front
+def multi_strip_light_through(t, angle, thickness, color, duration =2):
+    angle = math.radians(angle) + math.radians(90)
 
     gradient = gz.ColorGradient("linear", ((0, rgb_color_alpha(0.0)), (.5, color), (1, rgb_color_alpha(0.0))),
                                 xy1=(-thickness / 2, 0), xy2=(thickness / 2, 0))
@@ -39,7 +39,7 @@ def multi_strip_light_through(t, angle, thickness, color):
 
 
 def strip_light_through(t, angle, thickness, color):
-    angle += math.radians(90)  # to start animation from front
+    angle = math.radians(angle) + math.radians(90)
     center = (gz.polar2cart((H * 2 * t / duration) - H, angle))
 
     gradient = gz.ColorGradient("linear", ((0, rgb_color_alpha(0)), (.5, color), (1, rgb_color_alpha(0))),
@@ -75,6 +75,15 @@ def flank_light_pulse(t, xy1, xy2, color):
     rect = gz.rectangle(xy=(halfW, halfH), lx=W, ly=H, fill=gradient)
     rect.draw(surface)
 
+def light_pulsate(t, color, duration):
+    if t < duration / 3:
+        strength = easing.easeOutQuart(t, 0.0, 1.0, duration / 3)
+    elif t < duration * 2 / 3:
+        strength = 1.0 - easing.easeInQuart(t-duration * 1 / 3, 0.0, 1.0, duration * 1 / 3)
+    else:
+        strength = 0.0
+    rect = gz.rectangle(xy=(halfW, halfH), lx=W, ly=H, fill=tuple(i * strength for i in color))
+    rect.draw(surface)
 
 def point_light_grow_shrink(t, size, xy, color):
     # radius = W * (1 + (t * (duration - t)) ** 2) / 6

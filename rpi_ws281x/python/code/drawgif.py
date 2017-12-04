@@ -26,7 +26,7 @@ def make_frame(t):
     # point_light_through(t, leftX, rgb_color_alpha(253, 215, 15, .5))
     # point_light_through(t, rightX, rgb_color_alpha(253, 215, 15, .5))
 
-    point_light_grow_shrink(t, 140, (15, 30), rgb_color_alpha(253, 215, 15, .5))
+    # point_light_grow_shrink(t, 140, (15, 30), rgb_color_alpha(253, 215, 15, .5))
     # point_light_grow_shrink(t, (W-15, 15), rgb_color_alpha(253, 215, 15, .5))
 
     # flank_light_pulse(t, xy1=(0,halfH), xy2=(0,-bottomY), color= rgb_color_alpha(231, 37, 66, .5))
@@ -34,7 +34,7 @@ def make_frame(t):
     # flank_light_pulse(t, xy1=(-halfW, 0), xy2=(rightX, 0), color=rgb_color_alpha(231, 37, 66, .5))
     # flank_light_pulse(t, xy1=(halfW, 0), xy2=(-rightX, 0),color=rgb_color_alpha(231, 37, 66, .5))
 
-    # multi_strip_light_through(t, angle=math.radians(0), thickness=H / 3, color=rgb_color_alpha(17, 155, 255, .5))
+    multi_strip_light_through(t, angle=math.radians(180), thickness=H / 3, color=rgb_color_alpha(17, 155, 255, .5))
     # light_rotate_around(t, angle = math.radians(0), thickness = H, direction = 1, color = rgb_color_alpha(17, 155, 255, .5))
 
     # debugging ellipse

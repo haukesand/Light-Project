@@ -21,7 +21,8 @@ class animation:
         self.loop_time = loop_time
         self.always_loop = always_loop
         self.strength = strength
-        self.angle = angle
+        if angle is not None:
+            self.angle = angle - 180
         self.duration = 2  # default duration of the clip, in seconds
         self.time = 0.0
 
@@ -37,6 +38,7 @@ class animation:
             self.color = ah.rgb_color_alpha(253, 215, 15, .5)
             self.position = (W - 15, 30)
             self.size = 140
+
         elif self.type == "start_moving":
             self.function = "strip_light_through"
             self.color = ah.rgb_color_alpha(0, 191, 255, .5)
@@ -46,16 +48,18 @@ class animation:
             self.color = ah.rgb_color_alpha(135, 206, 235, .5)
             self.thickness = H / 4
             self.angle = self.angle - 180
+
         elif self.type == "lane_left":
             self.function = "point_light_through"
             self.posx = 0
             self.size = ah.halfW
-            self.color = ah.rgb_color_alpha(255, 255, 240, .5)
+            self.color = ah.rgb_color_alpha(200, 255, 200, .5)
         elif self.type == "lane_right":
             self.function = "point_light_through"
             self.posx = ah.W
             self.size = ah.halfW
-            self.color = ah.rgb_color_alpha(255, 255, 240, .5)
+            self.color = ah.rgb_color_alpha(200, 255, 200, .5)
+
         elif self.type == "depart_todestination":
             self.angle = 0
             self.function = "light_rotate_around"
@@ -67,16 +71,8 @@ class animation:
             self.function = "light_rotate_around"
             self.color = ah.rgb_color_alpha(127, 255, 212, .5)
             self.thickness = H
-            self.direction = 1
-        elif self.type == "slow_down":
-            self.angle = -180
-            self.function = "multi_strip_light_through"
-            self.color = ah.rgb_color_alpha(135, 206, 250, .5)
-            self.thickness = H / 3
-        elif self.type == "speed_up":  # TODO use strength for either speed of animation or visibility
-            self.function = "multi_strip_light_through"
-            self.color = ah.rgb_color_alpha(135, 206, 250, .5)
-            self.thickness = H / 3
+            self.direction = -1
+
         elif self.type == "highway_enter":
             self.angle = -45
             self.function = "multi_strip_light_through"
@@ -87,16 +83,16 @@ class animation:
             self.function = "multi_strip_light_through"
             self.color = ah.rgb_color_alpha(255, 215, 0, .5)
             self.thickness = H / 3
+
         elif self.type == "wait_trafficlight":
-            self.function = "point_light_grow_shrink"
-            self.color = ah.rgb_color_alpha(144, 238, 144, .5)
-            self.position = (ah.halfW, ah.halfH)
-            self.size = ah.H
+            self.function = "light_pulsate"
+            self.color = ah.rgb_color_alpha(144, 255, 144, .5)
+            self.duration = 3.0
         elif self.type == "wait_pedestrian":
-            self.function = "point_light_grow_shrink"
+            self.function = "light_pulsate"
             self.color = ah.rgb_color_alpha(255, 165, 0, .5)
-            self.position = (ah.halfW, ah.halfH)
-            self.size = ah.H
+            self.duration = 2.0
+
         elif self.type == "uneven_road":  # Needs a special animation type to "rattle"
             self.function = "multi_strip_light_through"
             self.angle = 0
@@ -107,14 +103,28 @@ class animation:
             self.xy1 = (ah.halfW, 0)
             self.xy2 = (-ah.rightX, 0)
             self.color = ah.rgb_color_alpha(220, 20, 60, .8)
+
         elif self.type == "brake_now":
             self.function = "flank_light_pulse"
             self.xy1 = (0, -ah.halfH)
             self.xy2 = (0, ah.bottomY)
-            self.color = ah.rgb_color_alpha(220, 20, 60, .01 * strength)
+            self.color = ah.rgb_color_alpha(255, 30, 70, .1 * strength)
+
+        elif self.type == "slow_down":
+            self.angle = -180
+            self.function = "multi_strip_light_through"
+            self.color = ah.rgb_color_alpha(135, 206, 250, .5)
+            self.thickness = H / 2
+        elif self.type == "speed_up":  # TODO use strength for either speed of animation or visibility
+            self.function = "multi_strip_light_through"
+            self.color = ah.rgb_color_alpha(135, 206, 250, .1 * strength)
+            self.duration = 1
+            # self.duration = (101 - strength) * 0.02
+            self.thickness = H / 3
         elif self.type == "speed_keep":  # TODO use strength for either speed of animation or visibility
             self.function = "multi_strip_light_through"
-            self.color = ah.rgb_color_alpha(255, 248, 220, .5)
+            self.duration = (86 - strength) * 0.02
+            self.color = ah.rgb_color_alpha(255, 248, 220, .2)
             self.thickness = H / 3.
 
 
@@ -153,14 +163,16 @@ class Draw(object):
                     ah.strip_light_through(
                         cur_animation.time, cur_animation.angle, cur_animation.thickness, cur_animation.color)
                 elif cur_animation.function == "multi_strip_light_through":
-                    ah.strip_light_through(
-                        cur_animation.time, cur_animation.angle, cur_animation.thickness, cur_animation.color)
+                    ah.multi_strip_light_through(
+                        cur_animation.time, cur_animation.angle, cur_animation.thickness, cur_animation.color, cur_animation.duration)
                 elif cur_animation.function == "light_rotate_around":
                     ah.light_rotate_around(cur_animation.time, cur_animation.angle,
                                            cur_animation.thickness, cur_animation.direction, cur_animation.color)
                 elif cur_animation.function == "flank_light_pulse":
                     ah.flank_light_pulse(
                         cur_animation.time, cur_animation.xy1, cur_animation.xy2, cur_animation.color)
+                elif cur_animation.function == "light_pulsate":
+                    ah.light_pulsate(cur_animation.time, cur_animation.color, cur_animation.duration)
 
                 if cur_animation.always_loop is not None and cur_animation.always_loop == False \
                         or cur_animation.loop_time is not None and cur_animation.loop_time <= 0.0 \
@@ -171,12 +183,11 @@ class Draw(object):
 
                 cur_animation.time += loop_delta  # increase framerate independently
                 if cur_animation.time >= cur_animation.duration:
-                    if cur_animation.loop_time is not None:  # checl if loop number needs to be reduced
-                        cur_animation.loop_time -= loop_delta
-                    elif cur_animation.loop_amount is not None:
+                    cur_animation.time = 0.0
+                    if cur_animation.loop_amount is not None:
                         cur_animation.loop_amount -= 1
-                    else:
-                        cur_animation.time = 0.0
+                if cur_animation.loop_time is not None:  # checl if loop number needs to be reduced
+                    cur_animation.loop_time -= loop_delta
 
             if toDelete is not None:  # turn off one animation each iteration
                 del animation_list[toDelete]
