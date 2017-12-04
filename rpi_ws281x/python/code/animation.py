@@ -9,7 +9,6 @@ import send
 animation_list = []
 W, H = 78, 90  # width, height, in pixels
 
-
 class animation:
     instances = []
 
@@ -126,8 +125,8 @@ class animation:
             self.duration = (86 - strength) * 0.02
             self.color = ah.rgb_color_alpha(255, 248, 220, .2)
             self.thickness = H / 3.
-
-        if always_loop == True:
+        
+        if self.always_loop == True:
             self.fadeout = True
             self.fadespeed = 0.03
             self.fadein = self.color[3]
@@ -138,10 +137,14 @@ class animation:
             self.fadeout = False
             self.fadein = False
 
+
+
+
 class Draw(object):
     def __init__(self):
         self._is_running = True
         self.last_frame = None  # numpy array of animations
+        self.light_on = False
 
         thread = threading.Thread(target=self.draw, args=())
         thread.daemon = True                            # Daemonize thread
@@ -189,6 +192,7 @@ class Draw(object):
                         cur_animation.time, cur_animation.xy1, cur_animation.xy2, cur_animation.color)
                 elif cur_animation.function == "light_pulsate":
                     ah.light_pulsate(cur_animation.time, cur_animation.color, cur_animation.duration)
+               
 
                 if cur_animation.always_loop is not None and cur_animation.always_loop == False \
                         or cur_animation.loop_time is not None and cur_animation.loop_time <= 0.0 \
@@ -238,6 +242,8 @@ class Draw(object):
             if one_animation.type == light_type:
                 one_animation.always_loop = False
                 print one_animation.type + ": Turning off"
+    def set_light(self, onoff):
+        self.light_on = onoff
 
     def stop(self):
         self._is_running = False
@@ -245,3 +251,5 @@ class Draw(object):
 
     def get_last_frame(self):
         return self.last_frame
+    def get_light_on(self):
+        return self.light_on

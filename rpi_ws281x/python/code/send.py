@@ -1,6 +1,7 @@
 
 # run with: sudo PYTHONPATH=".:build/lib.linux-armv7l-2.7" python examples/multistrandtest2image.py
 import sys
+sys.path.append("/home/pi/Light Project/rpi_ws281x/python/build/lib.linux-armv7l-2.7")
 import time
 import numpy as np
 import gizeh as gz
@@ -41,7 +42,8 @@ class Send(object):
         self.surface = gz.Surface(self.W,self.H, bg_color=(0,0,0))
         self.radius = 50
         self.t = 0
-        self.w = 60
+        self.w = 0
+        self.lightFlag = False
         # Create NeoPixel objects with appropriate configuration for each strip.
         self.strip1 = Adafruit_NeoPixel(LED_1_COUNT, LED_1_PIN, LED_1_FREQ_HZ,
                                    LED_1_DMA, LED_1_INVERT, LED_1_BRIGHTNESS, LED_1_CHANNEL, LED_1_STRIP)
@@ -61,7 +63,7 @@ class Send(object):
         # Intialize the library (must be called once before other functions).
         self.strip1.begin()
         self.strip2.begin()
-        self.whitein(self.strip1, self.strip2) # do this from wizard
+        
         print ('Press Ctrl-C to quit.')
 
         # settuppixel
@@ -71,6 +73,15 @@ class Send(object):
 
 
         while (self._is_running):
+            if self.animation.get_light_on() == True and not self.lightFlag:
+                self.w = 60
+                self.whitein(self.strip1, self.strip2) 
+                self.lightFlag = True
+            elif self.lightFlag and not self.animation.get_light_on():
+                self.blackout(self.strip1, self.strip2)
+                self.w = 0
+                self.lightFlag = False
+
             imDraw = self.animation.get_last_frame()
             maDraw = np.ma.masked_where(np.ma.getmask(maMap), imDraw, False)
 

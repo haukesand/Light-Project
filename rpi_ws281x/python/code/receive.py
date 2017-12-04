@@ -65,12 +65,15 @@ try:
                         angle = float(item[6:])
                         # drawNow.new_animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time, loop_amount=loop_amount,
                         #                       strength = strength, angle=angle)
-                if always_loop is not False or always_loop is None:
-                    drawNow.new_animation(light_type=light_type, always_loop=always_loop,
-                                          loop_time=loop_time, loop_amount=loop_amount, strength=strength, angle=angle)
+                if light_type !=    "light_up":
+                    print light_type
+                    if always_loop is not False or always_loop is None:
+                        drawNow.new_animation(light_type=light_type, always_loop=always_loop,
+                                              loop_time=loop_time, loop_amount=loop_amount, strength=strength, angle=angle)
+                    else:
+                        drawNow.off_animation(light_type=light_type)
                 else:
-                    drawNow.off_animation(light_type=light_type)
-
+                    drawNow.set_light(always_loop)
         except IOError:
             client_sock, client_info = server_sock.accept()
             print("Accepted Bluetooth connection from ", client_info)
