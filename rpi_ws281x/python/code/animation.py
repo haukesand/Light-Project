@@ -25,7 +25,6 @@ class animation:
             self.angle = angle - 180
         self.duration = 2  # default duration of the clip, in seconds
         self.time = 0.0
-
         # individual variables
         if self.type == "turn_left":
             # would be better to use a custom type here
@@ -75,23 +74,24 @@ class animation:
 
         elif self.type == "highway_enter":
             self.angle = -45
-            self.function = "multi_strip_light_through"
+            self.function = "strip_light_through"
             self.color = ah.rgb_color_alpha(255, 215, 0, .5)
             self.thickness = H / 3
         elif self.type == "highway_leave":
             self.angle = 45
-            self.function = "multi_strip_light_through"
+            self.function = "strip_light_through"
             self.color = ah.rgb_color_alpha(255, 215, 0, .5)
             self.thickness = H / 3
 
         elif self.type == "wait_trafficlight":
             self.function = "light_pulsate"
-            self.color = ah.rgb_color_alpha(144, 255, 144, .5)
+            self.color = ah.rgb_color_alpha(144, 255, 0, .5)
             self.duration = 3.0
+
         elif self.type == "wait_pedestrian":
             self.function = "light_pulsate"
             self.color = ah.rgb_color_alpha(255, 165, 0, .5)
-            self.duration = 2.0
+            self.duration = 3.0
 
         elif self.type == "uneven_road":  # Needs a special animation type to "rattle"
             self.function = "multi_strip_light_through"
@@ -127,6 +127,16 @@ class animation:
             self.color = ah.rgb_color_alpha(255, 248, 220, .2)
             self.thickness = H / 3.
 
+        if always_loop == True:
+            self.fadeout = True
+            self.fadespeed = 0.03
+            self.fadein = self.color[3]
+            self.color = list(self.color)
+            self.color[3] = 0.0
+            self.color[3]
+        else:
+            self.fadeout = False
+            self.fadein = False
 
 class Draw(object):
     def __init__(self):
@@ -153,6 +163,12 @@ class Draw(object):
 
             for index, cur_animation in enumerate(animation_list, start=0):
                 # render individual animations here
+
+                if cur_animation.fadein:
+                    cur_animation.color[3] += cur_animation.fadespeed
+                    if cur_animation.color[3] >= cur_animation.fadein:
+                        cur_animation.fadein = False
+
                 if cur_animation.function == "point_light_grow_shrink":
                     ah.point_light_grow_shrink(
                         cur_animation.time, cur_animation.size, cur_animation.position, cur_animation.color)
@@ -178,8 +194,12 @@ class Draw(object):
                         or cur_animation.loop_time is not None and cur_animation.loop_time <= 0.0 \
                         or cur_animation.loop_amount is not None and cur_animation.loop_amount <= 0:
                     # TODO Implement Fadout
-                    toDelete = index
-                    print cur_animation.type + ": is deleted"
+                    # print np.average(cur_animation.color)
+                    if cur_animation.fadeout and np.average(cur_animation.color) >= cur_animation.fadespeed:
+                        cur_animation.color = np.subtract(cur_animation.color , cur_animation.fadespeed) # this is framerate dependent
+                    else:
+                        toDelete = index
+                        print cur_animation.type + ": is deleted"
 
                 cur_animation.time += loop_delta  # increase framerate independently
                 if cur_animation.time >= cur_animation.duration:
