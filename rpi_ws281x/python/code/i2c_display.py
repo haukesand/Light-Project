@@ -47,7 +47,7 @@ def create_message(type):
 
     elif type == "turn_right":
         write_line(1, "About to: ")
-        write_line(2, "Turn left")
+        write_line(2, "Turn right")
 
     elif type == "start_moving":
         write_line(1, "")
@@ -76,6 +76,7 @@ def create_message(type):
     elif type == "highway_enter":
         write_line(1, "Entering:")
         write_line(2, "left")
+        
     elif type == "highway_leave":
         write_line(1, "Exiting:")
         write_line(2, "right")

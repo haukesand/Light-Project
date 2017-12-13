@@ -25,33 +25,6 @@ def poweroff():
     output = process.communicate()[0]
     print output
 
-def my_callback_button_start(channel):
-    print('Callback button_start')
-    drawNow.new_animation(light_type="depart_todestination", always_loop=False,
-                                              loop_time=None, loop_amount=1, strength=None, angle=None)
-
-def my_callback_button_stop(channel):
-    print('Callback button_stop')
-    drawNow.new_animation(light_type="swerve_left", always_loop=False,
-                                              loop_time=None, loop_amount=2, strength=None, angle=None)
-    time.sleep(2)
-    poweroff()
-
-def my_callback_button_light(channel):
-    drawNow.toggle_user_light()
-    print('Callback button_light')
-
-def my_callback_button_help(channel):
-    drawNow.toggle_augmentation_on()
-    print('Callback button_help')
-
-# GPIO.add_event_detect(button_start, GPIO.RISING, callback=my_callback_button_start, bouncetime=800)
-# GPIO.add_event_detect(button_stop, GPIO.RISING, callback=my_callback_button_stop, bouncetime=800)
-# GPIO.add_event_detect(button_light, GPIO.RISING, callback=my_callback_button_light, bouncetime=800)
-# GPIO.add_event_detect(button_help, GPIO.RISING, callback=my_callback_button_help, bouncetime=800)
-
-
-
 # Setup the bluetooth connection
 server_sock = BluetoothSocket(RFCOMM)
 server_sock.bind(("", PORT_ANY))
@@ -72,9 +45,38 @@ print ("Waiting for connection on RFCOMM channel %d" % port)
 try:
 
     drawNow = animation.Draw()
+    sendNow = send.Send(drawNow)
+
+    def my_callback_button_start(channel):
+        print('Callback button_start')
+        # drawNow.new_animation(light_type="depart_todestination", always_loop=False,
+        #                                           loop_time=None, loop_amount=20, strength=None, angle=None)
+        drawNow.user_starts_ride()
+
+
+    def my_callback_button_stop(channel):
+        print('Callback button_stop')
+
+        drawNow.new_animation(light_type="swerve_left", always_loop=False,
+                                                  loop_time=None, loop_amount=20, strength=None, angle=None)
+
+        # poweroff()
+
+    def my_callback_button_light(channel):
+        drawNow.toggle_user_light()
+        print('Callback button_light')
+
+    def my_callback_button_help(channel):
+        drawNow.toggle_augmentation_on()
+        print('Callback button_help')
+
+    GPIO.add_event_detect(button_start, GPIO.FALLING, callback=my_callback_button_start, bouncetime=1500)
+    GPIO.add_event_detect(button_stop, GPIO.FALLING, callback=my_callback_button_stop, bouncetime=1500)
+    GPIO.add_event_detect(button_light, GPIO.FALLING, callback=my_callback_button_light, bouncetime=1500)
+    GPIO.add_event_detect(button_help, GPIO.FALLING, callback=my_callback_button_help, bouncetime=1500)
+
     client_sock, client_info = server_sock.accept()
     print ("Accepted Bluetooth connection from ", client_info)
-    sendNow = send.Send(drawNow)
 
     while True:
         try:
@@ -112,7 +114,7 @@ try:
                         angle = float(item[6:])
                         # drawNow.new_animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time, loop_amount=loop_amount,
                         #                       strength = strength, angle=angle)
-                if light_type !=    "light_up":
+                if light_type != "light_up":
                     print light_type
                     if always_loop is not False or always_loop is None:
                         drawNow.new_animation(light_type=light_type, always_loop=always_loop,
@@ -121,6 +123,7 @@ try:
                         drawNow.off_animation(light_type=light_type)
                 else:
                     drawNow.set_light(always_loop)
+
         except IOError:
             client_sock, client_info = server_sock.accept()
             print("Accepted Bluetooth connection from ", client_info)
@@ -130,7 +133,9 @@ try:
     server_sock.close()
 
 except KeyboardInterrupt:
-    drawNow.stop()
     sendNow.stop()
+    drawNow.stop()
+    GPIO.remove_event_detect(button_start)
+    GPIO.cleanup()
     print "\nInterrupted from Keyboard interrupt in receive"
     pass

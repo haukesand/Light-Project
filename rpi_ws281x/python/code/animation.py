@@ -228,8 +228,9 @@ class Draw(object):
             time.sleep(0.008)
 
     def new_animation(self, light_type=None, always_loop=False, loop_amount=None, loop_time=None, strength=None, angle=None):
-        animation_list.append(animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time,
-                                        loop_amount=loop_amount, strength=strength, angle=angle))
+        if self.augmentation_on:
+            animation_list.append(animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time,
+                                            loop_amount=loop_amount, strength=strength, angle=angle))
         print light_type + ": Is new"
         display.create_message(light_type)
 
@@ -275,6 +276,12 @@ class Draw(object):
         else:
             display.write_line(1, "Augmentation:")
             display.write_line(2, "Off")
+
+    def user_starts_ride(self):
+        if self.augmentation_on:
+            animation_list.append(animation(light_type="depart_todestination", always_loop=False, loop_time=None, loop_amount=1, strength=None, angle=None))
+        display.write_line(1, "Have a ")
+        display.write_line(2, "good ride!")
 
     def stop(self):
         self._is_running = False
