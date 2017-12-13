@@ -3,10 +3,56 @@
 from bluetooth import *
 import animation
 import send
-#import threading
+import RPi.GPIO as GPIO
 import time
-# Setup the bluetooth connection
+# Setup the buttons
+GPIO.setmode(GPIO.BCM)
 
+button_start = 11
+button_stop = 8
+button_light = 9
+button_help = 10
+
+GPIO.setup(button_start, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(button_stop, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(button_light, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(button_help, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+def poweroff():
+    command = "/usr/bin/sudo /sbin/shutdown -P now"
+    import subprocess
+    process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+    output = process.communicate()[0]
+    print output
+
+def my_callback_button_start(channel):
+    print('Callback button_start')
+    drawNow.new_animation(light_type="depart_todestination", always_loop=False,
+                                              loop_time=None, loop_amount=1, strength=None, angle=None)
+
+def my_callback_button_stop(channel):
+    print('Callback button_stop')
+    drawNow.new_animation(light_type="swerve_left", always_loop=False,
+                                              loop_time=None, loop_amount=2, strength=None, angle=None)
+    time.sleep(2)
+    poweroff()
+
+def my_callback_button_light(channel):
+    drawNow.toggle_user_light()
+    print('Callback button_light')
+
+def my_callback_button_help(channel):
+    drawNow.toggle_augmentation_on()
+    print('Callback button_help')
+
+# GPIO.add_event_detect(button_start, GPIO.RISING, callback=my_callback_button_start, bouncetime=800)
+# GPIO.add_event_detect(button_stop, GPIO.RISING, callback=my_callback_button_stop, bouncetime=800)
+# GPIO.add_event_detect(button_light, GPIO.RISING, callback=my_callback_button_light, bouncetime=800)
+# GPIO.add_event_detect(button_help, GPIO.RISING, callback=my_callback_button_help, bouncetime=800)
+
+
+
+# Setup the bluetooth connection
 server_sock = BluetoothSocket(RFCOMM)
 server_sock.bind(("", PORT_ANY))
 server_sock.listen(1)
@@ -22,7 +68,6 @@ advertise_service(server_sock, "SampleServer",
                   #                   protocols = [ OBEX_UUID ]
                   )
 
-
 print ("Waiting for connection on RFCOMM channel %d" % port)
 try:
 
@@ -35,11 +80,13 @@ try:
         try:
             data = client_sock.recv(1024)
             print("received command %s" % data)
+            
             if data.startswith('<') and data.endswith('>'):
                 light_type, always_loop, loop_time, loop_amount, strength, angle = [
                     None] * 6
                 splitted = data[1:-1].split(',')
                 light_type = splitted[0]
+                # display.write_line(1, light_type)
                 for item in splitted[1:]:
                     if item.startswith('loop'):
                         loop_value = item[5:]

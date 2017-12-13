@@ -5,6 +5,8 @@ import gizeh as gz
 import numpy as np
 import weakref
 import send
+import i2c_display as display
+
 
 animation_list = []
 W, H = 78, 90  # width, height, in pixels
@@ -125,7 +127,7 @@ class animation:
             self.duration = (86 - strength) * 0.02
             self.color = ah.rgb_color_alpha(255, 248, 220, .2)
             self.thickness = H / 3.
-        
+
         if self.always_loop == True:
             self.fadeout = True
             self.fadespeed = 0.03
@@ -145,7 +147,7 @@ class Draw(object):
         self._is_running = True
         self.last_frame = None  # numpy array of animations
         self.light_on = False
-
+        self.augmentation_on = True
         thread = threading.Thread(target=self.draw, args=())
         thread.daemon = True                            # Daemonize thread
         thread.start()                                  # Start the execution
@@ -192,7 +194,7 @@ class Draw(object):
                         cur_animation.time, cur_animation.xy1, cur_animation.xy2, cur_animation.color)
                 elif cur_animation.function == "light_pulsate":
                     ah.light_pulsate(cur_animation.time, cur_animation.color, cur_animation.duration)
-               
+
 
                 if cur_animation.always_loop is not None and cur_animation.always_loop == False \
                         or cur_animation.loop_time is not None and cur_animation.loop_time <= 0.0 \
@@ -215,6 +217,8 @@ class Draw(object):
 
             if toDelete is not None:  # turn off one animation each iteration
                 del animation_list[toDelete]
+                display.write_line(1, "Autopilot")
+                display.write_line(2, "is active")
                 # print len(animation_list)
 
             self.last_frame = ah.getSurface()
@@ -227,6 +231,8 @@ class Draw(object):
         animation_list.append(animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time,
                                         loop_amount=loop_amount, strength=strength, angle=angle))
         print light_type + ": Is new"
+        display.create_message(light_type)
+
 
     # not yet implemented from sending side (changing strength and angle)
     def update_animation(self, light_type=None, always_loop=False, loop_amount=None, loop_time=None, strength=None, angle=None):
@@ -242,8 +248,33 @@ class Draw(object):
             if one_animation.type == light_type:
                 one_animation.always_loop = False
                 print one_animation.type + ": Turning off"
+
     def set_light(self, onoff):
+        if onoff == True:
+            display.write_line(1, "Hello!")
+            display.write_line(2, "")
+        else:
+            display.write_line(1, "Bye!")
+            display.write_line(2, "")
         self.light_on = onoff
+
+    def toggle_user_light(self):
+        self.light_on = not self.light_on
+        if self.light_on:
+            display.write_line(1, "Light:")
+            display.write_line(2, "On")
+        else:
+            display.write_line(1, "Light:")
+            display.write_line(2, "Off")
+
+    def toggle_augmentation_on(self):
+        self.augmentation_on = not self.augmentation_on
+        if self.augmentation_on:
+            display.write_line(1, "Augmentation:")
+            display.write_line(2, "On")
+        else:
+            display.write_line(1, "Augmentation:")
+            display.write_line(2, "Off")
 
     def stop(self):
         self._is_running = False
