@@ -5,13 +5,20 @@ import animation
 import send
 import RPi.GPIO as GPIO
 import time
+import threading
 # Setup the buttons
+
+# from tendo import singleton
+# me = singleton.SingleInstance() # will sys.exit(-1) if other instance is running
+
 GPIO.setmode(GPIO.BCM)
 
 button_start = 11
 button_stop = 8
 button_light = 9
 button_help = 10
+
+shutdown_count = 0
 
 GPIO.setup(button_start, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(button_stop, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -24,6 +31,28 @@ def poweroff():
     process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
     output = process.communicate()[0]
     print output
+
+def my_callback_button_stop(channel):
+
+    print('Callback button_stop')
+    global shutdown_count
+    drawNow.new_animation(light_type="swerve_left",  loop_amount=20, always_loop=None)
+    shutdown_count += 1
+    if shutdown_count > 3:
+        poweroff()
+
+def my_callback_button_start(channel):
+    print('Callback button_start')
+    drawNow.new_animation(light_type="depart_todestination", loop_amount=2, always_loop=None)
+
+def my_callback_button_light(channel):
+    drawNow.toggle_user_light()
+    print('Callback button_light')
+
+def my_callback_button_help(channel):
+    drawNow.toggle_augmentation_on()
+    print('Callback button_help')
+
 
 # Setup the bluetooth connection
 server_sock = BluetoothSocket(RFCOMM)
@@ -47,29 +76,6 @@ try:
     drawNow = animation.Draw()
     sendNow = send.Send(drawNow)
 
-    def my_callback_button_start(channel):
-        print('Callback button_start')
-        # drawNow.new_animation(light_type="depart_todestination", always_loop=False,
-        #                                           loop_time=None, loop_amount=20, strength=None, angle=None)
-        drawNow.user_starts_ride()
-
-
-    def my_callback_button_stop(channel):
-        print('Callback button_stop')
-
-        drawNow.new_animation(light_type="swerve_left", always_loop=False,
-                                                  loop_time=None, loop_amount=20, strength=None, angle=None)
-
-        # poweroff()
-
-    def my_callback_button_light(channel):
-        drawNow.toggle_user_light()
-        print('Callback button_light')
-
-    def my_callback_button_help(channel):
-        drawNow.toggle_augmentation_on()
-        print('Callback button_help')
-
     GPIO.add_event_detect(button_start, GPIO.FALLING, callback=my_callback_button_start, bouncetime=1500)
     GPIO.add_event_detect(button_stop, GPIO.FALLING, callback=my_callback_button_stop, bouncetime=1500)
     GPIO.add_event_detect(button_light, GPIO.FALLING, callback=my_callback_button_light, bouncetime=1500)
@@ -82,7 +88,7 @@ try:
         try:
             data = client_sock.recv(1024)
             print("received command %s" % data)
-            
+
             if data.startswith('<') and data.endswith('>'):
                 light_type, always_loop, loop_time, loop_amount, strength, angle = [
                     None] * 6
@@ -97,23 +103,21 @@ try:
                         elif loop_value == "INF":
                             always_loop = True
                         elif loop_value == "OFF":  # turn the animation off
-                            # drawNow.off_animation(light_type=light_type)
+                            drawNow.off_animation(light_type=light_type)
                             always_loop = False
                             break
                         elif loop_value == "ONE":  # turn the animation off
                             loop_amount = 1
                         else:
                             loop_amount = int(loop_value)
-                        # drawNow.new_animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time, loop_amount=loop_amount,
-                        #                       strength = strength, angle=angle)
                     elif item.startswith('strength'):
                         strength = float(item[9:])
-                        # drawNow.new_animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time, loop_amount=loop_amount,
-                        #                       strength = strength, angle=angle)
+                        drawNow.new_animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time, loop_amount=loop_amount,
+                                              strength = strength, angle=angle)
                     elif item.startswith('angle'):
                         angle = float(item[6:])
-                        # drawNow.new_animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time, loop_amount=loop_amount,
-                        #                       strength = strength, angle=angle)
+                        drawNow.new_animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time, loop_amount=loop_amount,
+                                              strength = strength, angle=angle)
                 if light_type != "light_up":
                     print light_type
                     if always_loop is not False or always_loop is None:

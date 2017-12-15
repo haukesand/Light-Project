@@ -9,7 +9,8 @@ import imageio
 import threading
 from neopixel import *
 from itertools import *
-
+from tendo import singleton
+me = singleton.SingleInstance() # will sys.exit(-1) if other instance is running
 # LED strip configuration:
 LED_1_COUNT = 120      # Number of LED pixels.
 # GPIO pin connected to the pixels (must support PWM! GPIO 13 and 18 on RPi 3).
@@ -52,7 +53,7 @@ class Send(object):
         self._is_running = True
         self.animation = animation
 
-        thread = threading.Thread(target=self.send, args=())
+        thread = threading.Thread(name='send', target=self.send, args=())
         thread.daemon = True                            # Daemonize thread
         thread.start()                                  # Start the execution
 
@@ -63,7 +64,7 @@ class Send(object):
         # Intialize the library (must be called once before other functions).
         self.strip1.begin()
         self.strip2.begin()
-        
+
         print ('Press Ctrl-C to quit.')
 
         # settuppixel
@@ -75,7 +76,7 @@ class Send(object):
         while (self._is_running):
             if self.animation.get_light_on() == True and not self.lightFlag:
                 self.w = 60
-                self.whitein(self.strip1, self.strip2) 
+                self.whitein(self.strip1, self.strip2)
                 self.lightFlag = True
             elif self.lightFlag and not self.animation.get_light_on():
                 self.blackout(self.strip1, self.strip2)

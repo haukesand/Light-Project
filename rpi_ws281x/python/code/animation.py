@@ -11,6 +11,21 @@ import i2c_display as display
 animation_list = []
 W, H = 78, 90  # width, height, in pixels
 
+
+try:
+    import prctl
+    def set_thread_name(name): prctl.set_name(name)
+
+    def _thread_name_hack(self):
+        set_thread_name(self.name)
+        threading.Thread.__bootstrap_original__(self)
+
+    threading.Thread.__bootstrap_original__ = threading.Thread._Thread__bootstrap
+    threading.Thread._Thread__bootstrap = _thread_name_hack
+except ImportError:
+    log('WARN: prctl module is not installed. You will not be able to see thread names')
+    def set_thread_name(name): pass
+
 class animation:
     instances = []
 
@@ -148,7 +163,7 @@ class Draw(object):
         self.last_frame = None  # numpy array of animations
         self.light_on = False
         self.augmentation_on = True
-        thread = threading.Thread(target=self.draw, args=())
+        thread = threading.Thread(name='animation', target=self.draw, args=())
         thread.daemon = True                            # Daemonize thread
         thread.start()                                  # Start the execution
 
@@ -225,7 +240,7 @@ class Draw(object):
             # print np.amax(self.last_frame)
 
             last_loop_time = time.time()
-            time.sleep(0.008)
+            time.sleep(0.007)
 
     def new_animation(self, light_type=None, always_loop=False, loop_amount=None, loop_time=None, strength=None, angle=None):
         if self.augmentation_on:
