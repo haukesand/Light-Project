@@ -18,7 +18,7 @@ LED_1_PIN = 13
 LED_1_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
 # DMA channel to use for generating signal (Between 1 and 14)
 LED_1_DMA = 10
-LED_1_BRIGHTNESS = 200     # Set to 0 for darkest and 255 for brightest
+LED_1_BRIGHTNESS = 255     # Set to 0 for darkest and 255 for brightest
 # True to invert the signal (when using NPN transistor level shift)
 LED_1_INVERT = False
 LED_1_CHANNEL = 1       # 0 or 1
@@ -30,7 +30,7 @@ LED_2_PIN = 12
 LED_2_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
 # DMA channel to use for generating signal (Between 1 and 14)
 LED_2_DMA = 10
-LED_2_BRIGHTNESS = 200     # Set to 0 for darkest and 255 for brightest
+LED_2_BRIGHTNESS = 255     # Set to 0 for darkest and 255 for brightest
 # True to invert the signal (when using NPN transistor level shift)
 LED_2_INVERT = False
 LED_2_CHANNEL = 0       # 0 or 1
@@ -75,7 +75,7 @@ class Send(object):
 
         while (self._is_running):
             if self.animation.get_light_on() == True and not self.lightFlag:
-                self.w = 60
+                self.w = 30
                 self.whitein(self.strip1, self.strip2)
                 self.lightFlag = True
             elif self.lightFlag and not self.animation.get_light_on():
@@ -96,8 +96,8 @@ class Send(object):
                 r = data[1]
                 b = data[2]
                 g = data[3]
-                w = self.w - (r + b + g) / 3
-                w = max(0, min(w, 127)) # for whatever reason is this maximal a positive uint8
+                w = self.w - r/2 + b/2 + g/2
+                w = max(0, min(w, self.w)) # for whatever reason is this maximal a positive uint8
                 if id <= 120:
                     myColor = Color(r, b, g, w)
                     self.strip2.setPixelColor(int(id), myColor)
@@ -135,11 +135,6 @@ class Send(object):
             strip1.show()
             strip2.show()
 
-
-        # ellipse = gz.ellipse(self.W, self.H, xy=(self.W / 2, self.H / 2),
-        #                     stroke_width=1, stroke=(1, 1, 1))
-        # ellipse.draw(self.surface)
-        # self.surface.write_to_png("assets/draw.png")
         return self.surface.get_npimage()
 
 def grouper(n, iterable, fillvalue=None):

@@ -19,6 +19,7 @@ E_DELAY = 0.00005
 INIT  = 0.01
 pause = 2
 
+
 def lcd_byte(bits, mode):
     bus.write_byte_data(DEVICE,GPIOB,LCD_RS*mode)
     bus.write_byte_data(DEVICE,GPIOA,bits)
@@ -28,7 +29,7 @@ def lcd_byte(bits, mode):
     bus.write_byte_data(DEVICE,GPIOB,LCD_RS*mode)
     time.sleep(E_DELAY)
 
-def lcd_string(message):
+def lcd_string( message):
     message = message.ljust(LCD_WIDTH," ")
     for i in range(LCD_WIDTH):
         lcd_byte(ord(message[i]),LCD_CHR)
@@ -76,7 +77,7 @@ def create_message(type):
     elif type == "highway_enter":
         write_line(1, "Entering:")
         write_line(2, "left")
-        
+
     elif type == "highway_leave":
         write_line(1, "Exiting:")
         write_line(2, "right")
@@ -94,7 +95,7 @@ def create_message(type):
         write_line(2, "Uneven road!")
 
     elif type == "swerve_left":
-        write_line(1, "")
+        write_line(1, "Obstacle ahead:")
         write_line(2, "Swerve left!")
 
 
@@ -129,4 +130,5 @@ for i in LCD_INIT:
 
 write_line(1, time.asctime())
 write_line(2, "IP:" + subprocess.check_output(["hostname","-I"])[:-2])
-# time.sleep(pause)
+
+    # time.sleep(pause)

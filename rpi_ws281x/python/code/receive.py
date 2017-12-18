@@ -6,11 +6,9 @@ import send
 import RPi.GPIO as GPIO
 import time
 import threading
+import i2c_display as display
+
 # Setup the buttons
-
-# from tendo import singleton
-# me = singleton.SingleInstance() # will sys.exit(-1) if other instance is running
-
 GPIO.setmode(GPIO.BCM)
 
 button_start = 11
@@ -19,6 +17,7 @@ button_light = 9
 button_help = 10
 
 shutdown_count = 0
+restart_count = 0
 
 GPIO.setup(button_start, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(button_stop, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -34,25 +33,32 @@ def poweroff():
 
 def my_callback_button_stop(channel):
 
-    print('Callback button_stop')
+    # print('Callback button_stop')
     global shutdown_count
-    drawNow.new_animation(light_type="swerve_left",  loop_amount=20, always_loop=None)
+    drawNow.user_stops_ride()
     shutdown_count += 1
-    if shutdown_count > 3:
+    if shutdown_count > 2:
+        display.write_line(1, "Shutdown")
+        display.write_line(2, "now")
         poweroff()
 
 def my_callback_button_start(channel):
-    print('Callback button_start')
+    # print('Callback button_start')
     drawNow.new_animation(light_type="depart_todestination", loop_amount=2, always_loop=None)
 
 def my_callback_button_light(channel):
     drawNow.toggle_user_light()
-    print('Callback button_light')
+    # print('Callback button_light')
 
 def my_callback_button_help(channel):
+    global restart_count
     drawNow.toggle_augmentation_on()
-    print('Callback button_help')
-
+    # print('Callback button_help')
+    restart_count += 1
+    if restart_count > 2:
+        display.write_line(1, "Restart")
+        display.write_line(2, "Thread")
+        os.execl(sys.executable, sys.executable, *sys.argv)
 
 # Setup the bluetooth connection
 server_sock = BluetoothSocket(RFCOMM)
@@ -119,7 +125,7 @@ try:
                         drawNow.new_animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time, loop_amount=loop_amount,
                                               strength = strength, angle=angle)
                 if light_type != "light_up":
-                    print light_type
+                    # print light_type
                     if always_loop is not False or always_loop is None:
                         drawNow.new_animation(light_type=light_type, always_loop=always_loop,
                                               loop_time=loop_time, loop_amount=loop_amount, strength=strength, angle=angle)
