@@ -98,12 +98,12 @@ class Send(object):
                 g = data[3]
                 w = self.w - r/2 + b/2 + g/2
                 w = max(0, min(w, self.w)) # for whatever reason is this maximal a positive uint8
-                if id <= 120:
+                if id < 120:
                     myColor = Color(r, b, g, w)
                     self.strip2.setPixelColor(int(id), myColor)
                 else:
                     myColor = Color(r, b, g, w)
-                    self.strip1.setPixelColor(int(120 - (id - 120)), myColor)
+                    self.strip1.setPixelColor(int(120 - (id - 119)), myColor)
                 # print "id: {0} r: {1} b: {2} g: {3}".format(id, r, b, g)
             self.strip1.show()
             self.strip2.show()

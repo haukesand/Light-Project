@@ -7,7 +7,7 @@ W, H = 78, 90  # width, height, in pixels
 halfW, halfH = W / 2, H / 2
 leftX, rightX = 0, W
 topY, bottomY = 0, H
-duration = 2  # duration of the clip, in seconds
+duration = 2.0  # duration of the clip, in seconds
 fps = 15
 surface = gz.Surface(W, H, bg_color=(0, 0, 0))
 
@@ -38,7 +38,7 @@ def multi_strip_light_through(t, angle, thickness, color, duration =2):
         rect.draw(surface)
 
 
-def strip_light_through(t, angle, thickness, color):
+def strip_light_through(t, angle, thickness, color, duration =2):
     angle = math.radians(angle) + math.radians(90)
     center = (gz.polar2cart((H * 2 * t / duration) - H, angle))
 
@@ -63,11 +63,13 @@ def light_rotate_around(t, angle, thickness, direction, color):
     rect.draw(surface)
 
 
-def flank_light_pulse(t, xy1, xy2, color):
-    if t < .5:
-        strength = easing.easeOutQuart(t, 0.0, 1.0, duration / 2)
+def flank_light_pulse(t, xy1, xy2, color, duration):
+    if t < duration /2:
+        # strength = t * duration/2
+        strength = easing.easeOutQuad(t, 0.0, 1.0, duration / 2)
     else:
-        strength = 1.0 - easing.easeInQuart(t, 0.0, 1.0, duration / 2)
+        # strength = duration - t 
+        strength = 1.0 - easing.easeInQuad(t-duration /2, 0.0, 1.0, duration * 1 /2)
 
     gradient = gz.ColorGradient("linear", ((0, tuple(i * strength for i in color)), (1, (0, 0, 0, 0))),
                                 xy1=xy1, xy2=xy2)
@@ -103,7 +105,7 @@ def point_light_grow_shrink(t, size, xy, color):
     circle.draw(surface)
 
 
-def point_light_through(t, size, posx, color):
+def point_light_through(t, size, posx, color, duration =2):
     y = (-H / 5) + (5 * H / 3) * (t / duration)
     gradient = gz.ColorGradient(type="radial",
                                 stops_colors=[

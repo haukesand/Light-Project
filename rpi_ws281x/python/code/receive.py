@@ -40,6 +40,14 @@ def my_callback_button_stop(channel):
     if shutdown_count > 2:
         display.write_line(1, "Shutdown")
         display.write_line(2, "now")
+        sendNow.stop()
+        drawNow.stop()
+        GPIO.remove_event_detect(button_start)
+        GPIO.remove_event_detect(button_stop)
+        GPIO.remove_event_detect(button_light)
+        GPIO.remove_event_detect(button_help)
+
+        GPIO.cleanup()
         poweroff()
 
 def my_callback_button_start(channel):
@@ -95,7 +103,7 @@ try:
             data = client_sock.recv(1024)
             print("received command %s" % data)
 
-            if data.startswith('<') and data.endswith('>'):
+            if data.startswith('<') and data.endswith('>') and not ">" in data[1:-1]:
                 light_type, always_loop, loop_time, loop_amount, strength, angle = [
                     None] * 6
                 splitted = data[1:-1].split(',')
@@ -118,12 +126,8 @@ try:
                             loop_amount = int(loop_value)
                     elif item.startswith('strength'):
                         strength = float(item[9:])
-                        drawNow.new_animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time, loop_amount=loop_amount,
-                                              strength = strength, angle=angle)
                     elif item.startswith('angle'):
                         angle = float(item[6:])
-                        drawNow.new_animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time, loop_amount=loop_amount,
-                                              strength = strength, angle=angle)
                 if light_type != "light_up":
                     # print light_type
                     if always_loop is not False or always_loop is None:
@@ -146,6 +150,9 @@ except KeyboardInterrupt:
     sendNow.stop()
     drawNow.stop()
     GPIO.remove_event_detect(button_start)
+    GPIO.remove_event_detect(button_stop)
+    GPIO.remove_event_detect(button_light)
+    GPIO.remove_event_detect(button_help)    
     GPIO.cleanup()
     print "\nInterrupted from Keyboard interrupt in receive"
     pass

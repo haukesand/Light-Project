@@ -14,8 +14,8 @@ LCD_CHR = 1
 LCD_CMD = 0
 LCD_RS = 0x02
 LCD_E  = 0x01
-E_PULSE = 0.0005
-E_DELAY = 0.0005
+E_PULSE = 0.00005 # 0.00005
+E_DELAY = 0.00005
 INIT  = 0.01
 pause = 2
 
@@ -140,6 +140,6 @@ class Display(object):
 
         elif type == "speed_keep":  # TODO use strength for either speed of animation or visibility
             self.write_line(1, "")
-            self.self.write_line(2, "Driving")
+            self.write_line(2, "Driving")
 
     
