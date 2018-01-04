@@ -35,14 +35,14 @@ class animation:
             # would be better to use a custom type here
             self.function = "point_light_grow_shrink"
             self.function_nr = 1
-            self.color = ah.rgb_color_alpha(253, 215, 15, .5)
+            self.color = ah.rgb_color_alpha(253, 215, 15, .8)
             self.position = (15, 30)
             self.size = 140
         elif self.type == "turn_right":
             self.type_nr = 1
             self.function = "point_light_grow_shrink"
             self.function_nr = 1
-            self.color = ah.rgb_color_alpha(253, 215, 15, .5)
+            self.color = ah.rgb_color_alpha(253, 215, 15, .8)
             self.position = (W - 15, 30)
             self.size = 140
         elif self.type == "start_moving":
@@ -51,7 +51,7 @@ class animation:
             self.function = "strip_light_through"
             self.function_nr = 5
             self.function_nr = 3
-            self.color = ah.rgb_color_alpha(0, 191, 255, .5)
+            self.color = ah.rgb_color_alpha(0, 191, 255, .6)
             self.thickness = H / 3
         elif self.type == "move_backwards":
             self.duration = 4.0
@@ -59,7 +59,7 @@ class animation:
             self.function = "strip_light_through"
             self.function_nr = 5
             self.function_nr = 3
-            self.color = ah.rgb_color_alpha(135, 206, 235, .5)
+            self.color = ah.rgb_color_alpha(135, 206, 235, .6)
             self.thickness = H / 4
             self.angle = self.angle - 180
         elif self.type == "lane_left":
@@ -69,7 +69,7 @@ class animation:
             self.duration = 2.5
             self.posx = 0
             self.size = 30
-            self.color = ah.rgb_color_alpha(255, 191, 0, .5)
+            self.color = ah.rgb_color_alpha(255, 191, 0, .8)
         elif self.type == "lane_right":
             self.type_nr=5
             self.function = "point_light_through"
@@ -77,19 +77,19 @@ class animation:
             self.duration = 2.5
             self.posx = ah.W
             self.size = 30
-            self.color = ah.rgb_color_alpha(255, 191, 0, .5)
+            self.color = ah.rgb_color_alpha(255, 191, 0, .8)
         elif self.type == "depart_todestination":
             self.type_nr = 6
             self.function = "light_rotate_around"
             self.function_nr = 5
-            self.color = ah.rgb_color_alpha(127, 255, 212, .5)
+            self.color = ah.rgb_color_alpha(127, 255, 212, 1)
             self.thickness = H
             self.direction = 1
         elif self.type == "arrive_destination":
             self.type_nr = 7
             self.function = "light_rotate_around"
             self.function_nr = 5
-            self.color = ah.rgb_color_alpha(127, 255, 212, .5)
+            self.color = ah.rgb_color_alpha(127, 255, 212, 1)
             self.thickness = H
             self.direction = -1
         elif self.type == "highway_enter":
@@ -99,7 +99,7 @@ class animation:
             self.function = "strip_light_through"
             self.function_nr= 5
             self.function_nr =3
-            self.color = ah.rgb_color_alpha(255, 215, 0, .5)
+            self.color = ah.rgb_color_alpha(255, 215, 0, .8)
             self.thickness = H / 3
         elif self.type == "highway_leave":
             self.type_nr = 9
@@ -108,25 +108,25 @@ class animation:
             self.function = "strip_light_through"
             self.function_nr = 5
             self.function_nr = 3
-            self.color = ah.rgb_color_alpha(255, 215, 0, .5)
+            self.color = ah.rgb_color_alpha(255, 215, 0, .8)
             self.thickness = H / 3
         elif self.type == "wait_trafficlight":
             self.type_nr = 10
             self.function = "light_pulsate"
             self.function_nr = 7
-            self.color = ah.rgb_color_alpha(255, 165, 0, .2)
+            self.color = ah.rgb_color_alpha(127,255,0, .3)
             self.duration = 3.0
         elif self.type == "wait_pedestrian":
             self.type_nr = 11
             self.function = "light_pulsate"
             self.function_nr = 7
-            self.color = ah.rgb_color_alpha(255, 100, 0, .3)
+            self.color = ah.rgb_color_alpha(102, 255, 102, .4)
             self.duration = 3.0
         elif self.type == "uneven_road":  # Needs a special animation type to "rattle"
             self.type_nr = 12
             self.function = "multi_strip_light_through"
             self.function_nr = 4
-            self.color = ah.rgb_color_alpha(250,128,114, .5)
+            self.color = ah.rgb_color_alpha(204, 0, 0, .6)
             self.thickness = H / 3
         elif self.type == "swerve_left":
             self.type_nr = 13
@@ -134,7 +134,7 @@ class animation:
             self.function_nr = 6
             self.xy1 = (ah.halfW, 0)
             self.xy2 = (-ah.rightX, 0)
-            self.color = ah.rgb_color_alpha(255, 0, 20, .8)
+            self.color = ah.rgb_color_alpha(255, 0, 20, 1)
         elif self.type == "brake_now":
             self.type_nr = 14
             self.function = "flank_light_pulse"
@@ -149,13 +149,13 @@ class animation:
             self.angle = -180
             self.function = "multi_strip_light_through"
             self.function_nr = 4
-            self.color = ah.rgb_color_alpha(135, 206, 250, .2)
+            self.color = ah.rgb_color_alpha(135, 206, 250, .3)
             self.thickness = H / 2
         elif self.type == "speed_up":  # TODO use strength for either speed of animation or visibility
             self.type_nr = 16
             self.function = "multi_strip_light_through"
             self.function_nr = 4
-            self.color = ah.rgb_color_alpha(135, 206, 250, .1 * (strength + 1))
+            self.color = ah.rgb_color_alpha(51, 102, 255, .1 * (strength + 1))
             self.duration = 1
             # self.duration = (101 - strength) * 0.02
             self.thickness = H / 3
@@ -164,7 +164,7 @@ class animation:
             self.function = "multi_strip_light_through"
             self.function_nr = 4
             self.duration = (86 - strength) * 0.02
-            self.color = ah.rgb_color_alpha(255, 248, 220, .1)
+            self.color = ah.rgb_color_alpha(255, 248, 220, .2)
             self.thickness = H / 3.
 
         if self.always_loop == True:
@@ -206,6 +206,7 @@ class Draw(object):
             loop_delta = current_loop_time - last_loop_time
             last_loop_time = time.time()
             toDelete = None  # mark which object should be deleted
+            display_reset_count = 0
             ah.background()  # clear background
 
             for index, cur_animation in enumerate(animation_list, start=0):
@@ -279,8 +280,13 @@ class Draw(object):
             if turn_idle:
                 idle_time += loop_delta
                 if idle_time > 0.5:
-                    self.display.write_line(1, "Autopilot")
-                    self.display.write_line(2, "is active")
+                    if display_reset_count > 3:
+                        self.display.restart()
+                        display_reset_count = 0
+                    else:
+                        self.display.write_line(1, "Autopilot")
+                        self.display.write_line(2, "is active")
+                        display_reset_count += 1
                     turn_idle = False
 
             self.last_frame = ah.getSurface()
@@ -307,10 +313,20 @@ class Draw(object):
                 # print one_animation.type + ": Updated"
 
     def off_animation(self, light_type=None):
-        for one_animation in animation_list:
-            if one_animation.type == light_type:
-                one_animation.always_loop = False
-                # print one_animation.type + ": Turning off"
+        if light_type == "all":
+            self.display.start()
+            for one_animation in animation_list:
+                if one_animation.always_loop is not None:
+                    one_animation.always_loop = False
+                elif one_animation.loop_time is not None:
+                    one_animation.loop_time = 0.0
+                elif one_animation.loop_amount is not None:
+                    one_animation.loop_amount = 0
+        else:
+            for one_animation in animation_list:
+                if one_animation.type == light_type:
+                    one_animation.always_loop = False
+                    # print one_animation.type + ": Turning off"
 
     def set_light(self, onoff):
         if onoff == True:
@@ -341,7 +357,7 @@ class Draw(object):
 
     def user_stops_ride(self):
         if self.augmentation_on:
-            animation_list.append(animation(light_type="swerve_left",  always_loop=False, loop_time=None, loop_amount=1, strength=None, angle=None))
+            animation_list.append(animation(light_type="swerve_left",  always_loop=None, loop_time=None, loop_amount=1, strength=None, angle=None))
         self.display.write_line(1, "Stopping")
         self.display.write_line(2, "vehicle!")
 

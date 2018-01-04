@@ -37,12 +37,28 @@ class Display(object):
         for i in LCD_INIT:
             self.lcd_byte(i,LCD_CMD)
             time.sleep(INIT)
-
-        self.write_line(1, time.asctime())
-        self.write_line(2, "IP:" + subprocess.check_output(["hostname","-I"])[:-2])
+        self.write_line(1, "Autopilot")
+        self.write_line(2, "is active")
+        # self.write_line(1, time.asctime())
+        # self.write_line(2, "IP:" + subprocess.check_output(["hostname","-I"])[:-2])
 
         # time.sleep(pause)
     
+    def restart(self):
+        self.bus = smbus.SMBus(1)
+        self.bus.write_byte_data(DEVICE,IODIRA,0x00)
+        self.bus.write_byte_data(DEVICE,IODIRB,0x00)
+        self.bus.write_byte_data(DEVICE,GPIOA,0x00)
+        self.bus.write_byte_data(DEVICE,GPIOB,0x00)
+
+        LCD_INIT = [0x33, 0x32, 0x38, 0x0C, 0x06, 0x01]
+        for i in LCD_INIT:
+            self.lcd_byte(i,LCD_CMD)
+            time.sleep(INIT)
+
+        self.display.write_line(1, "Autopilot")
+        self.display.write_line(2, "is active")
+
 
     def lcd_byte(self, bits, mode):
         self.bus.write_byte_data(DEVICE,GPIOB,LCD_RS*mode)

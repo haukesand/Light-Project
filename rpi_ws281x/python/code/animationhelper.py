@@ -71,7 +71,7 @@ def flank_light_pulse(t, xy1, xy2, color, duration):
         # strength = duration - t 
         strength = 1.0 - easing.easeInQuad(t-duration /2, 0.0, 1.0, duration * 1 /2)
 
-    gradient = gz.ColorGradient("linear", ((0, tuple(i * strength for i in color)), (1, (0, 0, 0, 0))),
+    gradient = gz.ColorGradient("linear", ((0, tuple(i * strength for i in color)), (0.7, (0, 0, 0, 0))),
                                 xy1=xy1, xy2=xy2)
 
     rect = gz.rectangle(xy=(halfW, halfH), lx=W, ly=H, fill=gradient)

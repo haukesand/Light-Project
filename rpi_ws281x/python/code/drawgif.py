@@ -32,9 +32,9 @@ def make_frame(t):
     # flank_light_pulse(t, xy1=(0,halfH), xy2=(0,-bottomY), color= rgb_color_alpha(231, 37, 66, .5))
     # flank_light_pulse(t, xy1=(0, -halfH), xy2=(0, bottomY), color=rgb_color_alpha(231, 37, 66, .5))
     # flank_light_pulse(t, xy1=(-halfW, 0), xy2=(rightX, 0), color=rgb_color_alpha(231, 37, 66, .5))
-    # flank_light_pulse(t, xy1=(halfW, 0), xy2=(-rightX, 0),color=rgb_color_alpha(231, 37, 66, .5))
+    flank_light_pulse(t, xy1=(halfW, 0), xy2=(-rightX, 0),color=rgb_color_alpha(231, 37, 66, .5))
 
-    multi_strip_light_through(t, angle=math.radians(180), thickness=H / 3, color=rgb_color_alpha(17, 155, 255, .5))
+    # multi_strip_light_through(t, angle=math.radians(180), thickness=H / 3, color=rgb_color_alpha(17, 155, 255, .5))
     # light_rotate_around(t, angle = math.radians(0), thickness = H, direction = 1, color = rgb_color_alpha(17, 155, 255, .5))
 
     # debugging ellipse
@@ -90,7 +90,7 @@ def flank_light_pulse(t, xy1, xy2, color):
     else:
         strength = 1.0 - easing.easeInQuart(t, 0.0, 1.0, duration / 2)
 
-    gradient = gz.ColorGradient("linear", ((0, tuple(i * strength for i in color)), (1, (0, 0, 0, 0))),
+    gradient = gz.ColorGradient("linear", ((0, tuple(i * strength for i in color)), (0.7, (0, 0, 0, 0))),
                                 xy1=xy1, xy2=xy2)
 
     rect = gz.rectangle(xy=(halfW, halfH), lx=W, ly=H, fill=gradient)
