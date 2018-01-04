@@ -21,28 +21,10 @@ pause = 2
 
 class Display(object):
     def __init__(self):
-        thread = threading.Thread(name='display', target=self.start, args=())
+        thread = threading.Thread(name='display', target=self.restart, args=())
         thread.daemon = True                            # Daemonize thread
         thread.start()                                  # Start the execution
-        print "Start display thread"
-        
-    def start(self):
-        self.bus = smbus.SMBus(1)
-        self.bus.write_byte_data(DEVICE,IODIRA,0x00)
-        self.bus.write_byte_data(DEVICE,IODIRB,0x00)
-        self.bus.write_byte_data(DEVICE,GPIOA,0x00)
-        self.bus.write_byte_data(DEVICE,GPIOB,0x00)
-
-        LCD_INIT = [0x33, 0x32, 0x38, 0x0C, 0x06, 0x01]
-        for i in LCD_INIT:
-            self.lcd_byte(i,LCD_CMD)
-            time.sleep(INIT)
-        self.write_line(1, "Autopilot")
-        self.write_line(2, "is active")
-        # self.write_line(1, time.asctime())
-        # self.write_line(2, "IP:" + subprocess.check_output(["hostname","-I"])[:-2])
-
-        # time.sleep(pause)
+        print "Start display thread" 
     
     def restart(self):
         self.bus = smbus.SMBus(1)
@@ -56,8 +38,8 @@ class Display(object):
             self.lcd_byte(i,LCD_CMD)
             time.sleep(INIT)
 
-        self.display.write_line(1, "Autopilot")
-        self.display.write_line(2, "is active")
+        self.write_line(1, "Autopilot")
+        self.write_line(2, "is active")
 
 
     def lcd_byte(self, bits, mode):
@@ -131,7 +113,7 @@ class Display(object):
             self.write_line(1, "Waiting for:")
             self.write_line(2, "pedestrian")
 
-        elif type == "uneven_road":  # Needs a special animation type to "rattle"
+        elif type == "uneven_road":  
             self.write_line(1, "")
             self.write_line(2, "Uneven road!")
 
@@ -139,22 +121,19 @@ class Display(object):
             self.write_line(1, "Obstacle ahead:")
             self.write_line(2, "Swerve left!")
 
-
         elif type == "brake_now":
             self.write_line(1, "")
             self.write_line(2, "Braking")
-
 
         elif type == "slow_down":
             self.write_line(1, "")
             self.write_line(2, "Slowing down")
 
-
-        elif type == "speed_up":  # TODO use strength for either speed of animation or visibility
+        elif type == "speed_up":  
             self.write_line(1, "")
             self.write_line(2, "Speeding up")
 
-        elif type == "speed_keep":  # TODO use strength for either speed of animation or visibility
+        elif type == "speed_keep":  
             self.write_line(1, "")
             self.write_line(2, "Driving")
 
