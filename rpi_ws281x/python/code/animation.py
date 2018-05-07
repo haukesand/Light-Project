@@ -5,11 +5,11 @@ import gizeh as gz
 import numpy as np
 import weakref
 import send
-import i2c_display_class
+# import i2c_display_class
 from tendo import singleton
 me = singleton.SingleInstance() 
 animation_list = []
-W, H = 78, 90  # width, height, in pixels
+W, H = 19, 20  # width, height, in pixels
 
 
 class animation:
@@ -187,7 +187,7 @@ class Draw(object):
         self.last_frame = None  # numpy array of animations
         self.light_on = False
         self.augmentation_on = True
-        self.display = i2c_display_class.Display()
+        # self.display = i2c_display_class.Display()
 
         thread = threading.Thread(name='animation', target=self.draw, args=())
         thread.daemon = True                            # Daemonize thread
@@ -272,8 +272,8 @@ class Draw(object):
             
             if toDelete is not None:  # turn off one animation each iteration
                 del animation_list[toDelete]
-                if len(animation_list) == 0:
-                    self.display.restart() # restart the screen
+                # if len(animation_list) == 0:
+                #     self.display.restart() # restart the screen
 
 
 
@@ -284,7 +284,7 @@ class Draw(object):
             time.sleep(0.0005)
 
     def new_animation(self, light_type=None, always_loop=False, loop_amount=None, loop_time=None, strength=None, angle=None):
-        self.display.create_message(light_type)
+        # self.display.create_message(light_type)
         if self.augmentation_on:
             animation_list.append(animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time,
                                             loop_amount=loop_amount, strength=strength, angle=angle))
@@ -302,7 +302,7 @@ class Draw(object):
 
     def off_animation(self, light_type=None):
         if light_type == "all":
-            self.display.restart()
+            # self.display.restart()
             for one_animation in animation_list:
                 if one_animation.always_loop is not None:
                     one_animation.always_loop = False
@@ -317,37 +317,37 @@ class Draw(object):
                     # print one_animation.type + ": Turning off"
 
     def set_light(self, onoff):
-        if onoff == True:
-            self.display.write_line(1, "Hello!")
-            self.display.write_line(2, "")
-        else:
-            self.display.write_line(1, "Bye!")
-            self.display.write_line(2, "")
+        # if onoff == True:
+        #     self.display.write_line(1, "Hello!")
+        #     self.display.write_line(2, "")
+        # else:
+        #     self.display.write_line(1, "Bye!")
+        #     self.display.write_line(2, "")
         self.light_on = onoff
 
     def toggle_user_light(self):
         self.light_on = not self.light_on
-        if self.light_on:
-            self.display.write_line(1, "Light:")
-            self.display.write_line(2, "On")
-        else:
-            self.display.write_line(1, "Light:")
-            self.display.write_line(2, "Off")
+        # if self.light_on:
+        #     self.display.write_line(1, "Light:")
+        #     self.display.write_line(2, "On")
+        # else:
+        #     self.display.write_line(1, "Light:")
+        #     self.display.write_line(2, "Off")
 
     def toggle_augmentation_on(self):
         self.augmentation_on = not self.augmentation_on
-        if self.augmentation_on:
-            self.display.write_line(1, "Guide light:")
-            self.display.write_line(2, "On")
-        else:
-            self.display.write_line(1, "Guide light:")
-            self.display.write_line(2, "Off")
+        # if self.augmentation_on:
+        #     self.display.write_line(1, "Guide light:")
+        #     self.display.write_line(2, "On")
+        # else:
+        #     self.display.write_line(1, "Guide light:")
+        #     self.display.write_line(2, "Off")
 
     def user_stops_ride(self):
         if self.augmentation_on:
             animation_list.append(animation(light_type="swerve_left",  always_loop=None, loop_time=None, loop_amount=1, strength=None, angle=None))
-        self.display.write_line(1, "Stopping")
-        self.display.write_line(2, "vehicle!")
+        # self.display.write_line(1, "Stopping")
+        # self.display.write_line(2, "vehicle!")
 
     def stop(self):
         self._is_running = False

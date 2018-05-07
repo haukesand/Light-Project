@@ -3,7 +3,7 @@ import moviepy.editor as mpy
 import math
 import easing
 
-W, H = 78, 90  # width, height, in pixels
+W, H = 19, 20  # width, height, in pixels
 halfW, halfH = W / 2, H / 2
 leftX, rightX = 0, W
 topY, bottomY = 0, H

@@ -3,13 +3,13 @@
 from bluetooth import *
 import animation
 import send
-import RPi.GPIO as GPIO
+# import RPi.GPIO as GPIO
 import time
 import threading
-import i2c_display as display
+# import i2c_display as display
 
 # Setup the buttons
-GPIO.setmode(GPIO.BCM)
+# GPIO.setmode(GPIO.BCM)
 
 button_start = 11
 button_stop = 8
@@ -19,10 +19,10 @@ button_help = 10
 shutdown_count = 0
 restart_count = 0
 
-GPIO.setup(button_start, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(button_stop, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(button_light, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(button_help, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+# GPIO.setup(button_start, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+# GPIO.setup(button_stop, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+# GPIO.setup(button_light, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+# GPIO.setup(button_help, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 def poweroff():
     command = "/usr/bin/sudo /sbin/shutdown -P now"
@@ -38,16 +38,16 @@ def my_callback_button_stop(channel):
     drawNow.user_stops_ride()
     shutdown_count += 1
     if shutdown_count > 2:
-        display.write_line(1, "Shutdown")
-        display.write_line(2, "now")
+        # display.write_line(1, "Shutdown")
+        # display.write_line(2, "now")
         sendNow.stop()
         drawNow.stop()
-        GPIO.remove_event_detect(button_start)
-        GPIO.remove_event_detect(button_stop)
-        GPIO.remove_event_detect(button_light)
-        GPIO.remove_event_detect(button_help)
+        # GPIO.remove_event_detect(button_start)
+        # GPIO.remove_event_detect(button_stop)
+        # GPIO.remove_event_detect(button_light)
+        # GPIO.remove_event_detect(button_help)
 
-        GPIO.cleanup()
+        # GPIO.cleanup()
         poweroff()
 
 def my_callback_button_start(channel):
@@ -64,8 +64,8 @@ def my_callback_button_help(channel):
     # print('Callback button_help')
     restart_count += 1
     if restart_count > 2:
-        display.write_line(1, "Restart")
-        display.write_line(2, "Thread")
+        # display.write_line(1, "Restart")
+        # display.write_line(2, "Thread")
         os.execl(sys.executable, sys.executable, *sys.argv)
 
 # Setup the bluetooth connection
@@ -90,10 +90,10 @@ try:
     drawNow = animation.Draw()
     sendNow = send.Send(drawNow)
 
-    GPIO.add_event_detect(button_start, GPIO.FALLING, callback=my_callback_button_start, bouncetime=1500)
-    GPIO.add_event_detect(button_stop, GPIO.FALLING, callback=my_callback_button_stop, bouncetime=1500)
-    GPIO.add_event_detect(button_light, GPIO.FALLING, callback=my_callback_button_light, bouncetime=1500)
-    GPIO.add_event_detect(button_help, GPIO.FALLING, callback=my_callback_button_help, bouncetime=1500)
+    # GPIO.add_event_detect(button_start, GPIO.FALLING, callback=my_callback_button_start, bouncetime=1500)
+    # GPIO.add_event_detect(button_stop, GPIO.FALLING, callback=my_callback_button_stop, bouncetime=1500)
+    # GPIO.add_event_detect(button_light, GPIO.FALLING, callback=my_callback_button_light, bouncetime=1500)
+    # GPIO.add_event_detect(button_help, GPIO.FALLING, callback=my_callback_button_help, bouncetime=1500)
 
     client_sock, client_info = server_sock.accept()
     print ("Accepted Bluetooth connection from ", client_info)
@@ -149,10 +149,10 @@ try:
 except KeyboardInterrupt:
     sendNow.stop()
     drawNow.stop()
-    GPIO.remove_event_detect(button_start)
-    GPIO.remove_event_detect(button_stop)
-    GPIO.remove_event_detect(button_light)
-    GPIO.remove_event_detect(button_help)    
-    GPIO.cleanup()
+    # GPIO.remove_event_detect(button_start)
+    # GPIO.remove_event_detect(button_stop)
+    # GPIO.remove_event_detect(button_light)
+    # GPIO.remove_event_detect(button_help)    
+    # GPIO.cleanup()
     print "\nInterrupted from Keyboard interrupt in receive"
     pass

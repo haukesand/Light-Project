@@ -12,9 +12,9 @@ from itertools import *
 from tendo import singleton
 me = singleton.SingleInstance() # will sys.exit(-1) if other instance is running
 # LED strip configuration:
-LED_1_COUNT = 120      # Number of LED pixels.
+LED_1_COUNT = 54      # Number of LED pixels.
 # GPIO pin connected to the pixels (must support PWM! GPIO 13 and 18 on RPi 3).
-LED_1_PIN = 13
+LED_1_PIN = 12
 LED_1_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
 # DMA channel to use for generating signal (Between 1 and 14)
 LED_1_DMA = 10
@@ -22,23 +22,11 @@ LED_1_BRIGHTNESS = 255     # Set to 0 for darkest and 255 for brightest
 # True to invert the signal (when using NPN transistor level shift)
 LED_1_INVERT = False
 LED_1_CHANNEL = 1       # 0 or 1
-LED_1_STRIP = ws.SK6812_STRIP_GRBW
-
-LED_2_COUNT = 120      # Number of LED pixels.
-# GPIO pin connected to the pixels (must support PWM! GPIO 13 or 18 on RPi 3).
-LED_2_PIN = 12
-LED_2_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
-# DMA channel to use for generating signal (Between 1 and 14)
-LED_2_DMA = 10
-LED_2_BRIGHTNESS = 255     # Set to 0 for darkest and 255 for brightest
-# True to invert the signal (when using NPN transistor level shift)
-LED_2_INVERT = False
-LED_2_CHANNEL = 0       # 0 or 1
-LED_2_STRIP = ws.SK6812_STRIP_GRBW
+LED_1_STRIP = ws.WS2811_STRIP_GRB
 
 class Send(object):
     def __init__(self, animation):
-        self.H,self.W = 90,78
+        self.H,self.W = 19,20
         self.position = 0
         self.surface = gz.Surface(self.W,self.H, bg_color=(0,0,0))
         self.radius = 50
@@ -48,8 +36,7 @@ class Send(object):
         # Create NeoPixel objects with appropriate configuration for each strip.
         self.strip1 = Adafruit_NeoPixel(LED_1_COUNT, LED_1_PIN, LED_1_FREQ_HZ,
                                    LED_1_DMA, LED_1_INVERT, LED_1_BRIGHTNESS, LED_1_CHANNEL, LED_1_STRIP)
-        self.strip2 = Adafruit_NeoPixel(LED_2_COUNT, LED_2_PIN, LED_2_FREQ_HZ,
-                                   LED_2_DMA, LED_2_INVERT, LED_2_BRIGHTNESS, LED_2_CHANNEL, LED_2_STRIP)
+        
         self._is_running = True
         self.animation = animation
 
@@ -63,12 +50,11 @@ class Send(object):
     def send(self):
         # Intialize the library (must be called once before other functions).
         self.strip1.begin()
-        self.strip2.begin()
 
         print ('Press Ctrl-C to quit.')
 
         # settuppixel
-        imMap = imageio.imread('assets/240RGB.png')  # imMap = np.int_(imMap)
+        imMap = imageio.imread('assets/54CC_out.png')  # imMap = np.int_(imMap)
         # Mask the Map and False to work in place
         maMap = np.ma.masked_where(imMap > 240, imMap, False)
 
@@ -76,10 +62,10 @@ class Send(object):
         while (self._is_running):
             if self.animation.get_light_on() == True and not self.lightFlag:
                 self.w = 30
-                self.whitein(self.strip1, self.strip2)
+                self.whitein(self.strip1)
                 self.lightFlag = True
             elif self.lightFlag and not self.animation.get_light_on():
-                self.blackout(self.strip1, self.strip2)
+                self.blackout(self.strip1)
                 self.w = 0
                 self.lightFlag = False
 
@@ -98,42 +84,32 @@ class Send(object):
                 g = data[3]
                 w = self.w - r/2 + b/2 + g/2
                 w = max(0, min(w, self.w)) # for whatever reason is this maximal a positive uint8
-                if id < 120:
-                    myColor = Color(r, b, g, w)
-                    self.strip2.setPixelColor(int(id), myColor)
-                else:
-                    myColor = Color(r, b, g, w)
-                    self.strip1.setPixelColor(int(120 - (id - 119)), myColor)
+                myColor = Color(r, b, g)
+                self.strip1.setPixelColor(int(id), myColor)
+               
                 # print "id: {0} r: {1} b: {2} g: {3}".format(id, r, b, g)
             self.strip1.show()
-            self.strip2.show()
 
 
     def stop(self):
         self._is_running = False
-        self.blackout(self.strip1, self.strip2)
+        self.blackout(self.strip1)
         print "\nStopped sending"
         sys.exit(0)
 
-    def blackout(self, strip1, strip2):
+    def blackout(self, strip1):
         for n in range (self.w):
             w = self.w - n
             for i in range(LED_1_COUNT):
-                strip1.setPixelColor(i, Color(0, 0, 0, w))
-            for i in range(LED_2_COUNT):
-                strip2.setPixelColor(i, Color(0, 0, 0, w))
+                strip1.setPixelColor(i, Color(150, 150, 150))
             strip1.show()
-            strip2.show()
 
-    def whitein(self, strip1, strip2):
+    def whitein(self, strip1):
         for n in range (self.w):
             w = n
             for i in range(LED_1_COUNT):
                 strip1.setPixelColor(i, Color(0, 0, 0, w))
-            for i in range(LED_2_COUNT):
-                strip2.setPixelColor(i, Color(0, 0, 0, w))
-            strip1.show()
-            strip2.show()
+                strip1.show()
 
         return self.surface.get_npimage()
 
