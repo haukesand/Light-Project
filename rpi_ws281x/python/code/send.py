@@ -14,14 +14,14 @@ me = singleton.SingleInstance() # will sys.exit(-1) if other instance is running
 # LED strip configuration:
 LED_1_COUNT = 54      # Number of LED pixels.
 # GPIO pin connected to the pixels (must support PWM! GPIO 13 and 18 on RPi 3).
-LED_1_PIN = 12
+LED_1_PIN = 18
 LED_1_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
 # DMA channel to use for generating signal (Between 1 and 14)
 LED_1_DMA = 10
 LED_1_BRIGHTNESS = 255     # Set to 0 for darkest and 255 for brightest
 # True to invert the signal (when using NPN transistor level shift)
 LED_1_INVERT = False
-LED_1_CHANNEL = 1       # 0 or 1
+LED_1_CHANNEL = 0       # 0 or 1
 LED_1_STRIP = ws.WS2811_STRIP_GRB
 
 class Send(object):
@@ -54,7 +54,7 @@ class Send(object):
         print ('Press Ctrl-C to quit.')
 
         # settuppixel
-        imMap = imageio.imread('assets/54CC_out.png')  # imMap = np.int_(imMap)
+        imMap = imageio.imread('/home/pi/Light Project/rpi_ws281x/python/assets/54CC_out.png')  # imMap = np.int_(imMap)
         # Mask the Map and False to work in place
         maMap = np.ma.masked_where(imMap > 240, imMap, False)
 
@@ -79,9 +79,9 @@ class Send(object):
 
             for data in iterCMP:
                 id = data[0]
-                r = data[1]
-                b = data[2]
-                g = data[3]
+                r = int(data[1])
+                b = int(data[2])
+                g = int(data[3])
                 w = self.w - r/2 + b/2 + g/2
                 w = max(0, min(w, self.w)) # for whatever reason is this maximal a positive uint8
                 myColor = Color(r, b, g)
