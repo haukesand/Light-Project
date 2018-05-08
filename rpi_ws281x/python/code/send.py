@@ -26,10 +26,10 @@ LED_1_STRIP = ws.WS2811_STRIP_GRB
 
 class Send(object):
     def __init__(self, animation):
-        self.H,self.W = 19,20
+        self.W,self.H = 19,20
         self.position = 0
         self.surface = gz.Surface(self.W,self.H, bg_color=(0,0,0))
-        self.radius = 50
+        # self.radius = 50
         self.t = 0
         self.w = 0
         self.lightFlag = False
@@ -52,23 +52,40 @@ class Send(object):
         self.strip1.begin()
 
         print ('Press Ctrl-C to quit.')
+        
+        #print some colors
+        for j in range(256*10):
+            for i in range(54):
+                self.strip1.setPixelColor(i, wheel((int(i * 256 / 54) + j) & 255))
+            self.strip1.show()
+            time.sleep(20/1000.0)
+
 
         # settuppixel
-        imMap = imageio.imread('/home/pi/Light Project/rpi_ws281x/python/assets/54CC_out.png')  # imMap = np.int_(imMap)
-        # Mask the Map and False to work in place
-        maMap = np.ma.masked_where(imMap > 240, imMap, False)
+        imMap = imageio.imread('/home/pi/Light Project/rpi_ws281x/python/assets/54CC_out.png')  # 
+        print np.shape(imMap)
+        imMap = np.int_(imMap)
 
+        # Mask the Map and False to work in place
+        maMap = np.ma.masked_where(imMap >= 255, imMap, False)
+        
+        #reset black
+        for i in range(LED_1_COUNT):
+            self.strip1.setPixelColor(i, Color(0, 0, 0))
+        self.strip1.show()
 
         while (self._is_running):
-            if self.animation.get_light_on() == True and not self.lightFlag:
-                self.w = 30
-                self.whitein(self.strip1)
-                self.lightFlag = True
-            elif self.lightFlag and not self.animation.get_light_on():
-                self.blackout(self.strip1)
-                self.w = 0
-                self.lightFlag = False
+            # if self.animation.get_light_on() == True and not self.lightFlag:
+            #     self.w = 30
+            #     self.whitein(self.strip1)
+            #     self.lightFlag = True
+            # elif self.lightFlag and not self.animation.get_light_on():
+            #     self.blackout(self.strip1)
+            #     self.w = 0
+            #     self.lightFlag = False
+            
 
+            # if self.animation.get_idle_light_on() == False:
             imDraw = self.animation.get_last_frame()
             maDraw = np.ma.masked_where(np.ma.getmask(maMap), imDraw, False)
 
@@ -82,14 +99,21 @@ class Send(object):
                 r = int(data[1])
                 b = int(data[2])
                 g = int(data[3])
-                w = self.w - r/2 + b/2 + g/2
-                w = max(0, min(w, self.w)) # for whatever reason is this maximal a positive uint8
+                # w = self.w - r/2 + b/2 + g/2
+                # w = max(0, min(w, self.w)) # for whatever reason is this maximal a positive uint8
                 myColor = Color(r, b, g)
                 self.strip1.setPixelColor(int(id), myColor)
                
                 # print "id: {0} r: {1} b: {2} g: {3}".format(id, r, b, g)
-            self.strip1.show()
+                # print(np.around(compMapDraw,decimals=3))
 
+            self.strip1.show()
+            # else:
+            #     for j in range(256*5):
+            #         for i in range(54):
+            #             self.strip1.setPixelColor(i, wheel((int(i * 256 / 54) + j) & 255))
+            #     self.strip1.show()
+            #     # time.sleep(20/1000.0)
 
     def stop(self):
         self._is_running = False
@@ -101,14 +125,14 @@ class Send(object):
         for n in range (self.w):
             w = self.w - n
             for i in range(LED_1_COUNT):
-                strip1.setPixelColor(i, Color(150, 150, 150))
+                strip1.setPixelColor(i, Color(0, 0, 0))
             strip1.show()
 
     def whitein(self, strip1):
         for n in range (self.w):
             w = n
             for i in range(LED_1_COUNT):
-                strip1.setPixelColor(i, Color(0, 0, 0, w))
+                strip1.setPixelColor(i, Color(125, 125, 125))
                 strip1.show()
 
         return self.surface.get_npimage()
@@ -117,3 +141,14 @@ def grouper(n, iterable, fillvalue=None):
         "grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx"
         args = [iter(iterable)] * n
         return izip_longest(fillvalue=fillvalue, *args)
+
+def wheel(pos):
+    """Generate rainbow colors across 0-255 positions."""
+    if pos < 85:
+        return Color(pos * 3, 255 - pos * 3, 0)
+    elif pos < 170:
+        pos -= 85
+        return Color(255 - pos * 3, 0, pos * 3)
+    else:
+        pos -= 170
+        return Color(0, pos * 3, 255 - pos * 3)

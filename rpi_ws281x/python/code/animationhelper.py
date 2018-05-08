@@ -15,7 +15,7 @@ surface = gz.Surface(W, H, bg_color=(0, 0, 0))
 
 
 def background():
-    background = gz.rectangle(xy=(halfW, halfH), lx=W,
+    background = gz.rectangle(xy=(halfW, halfH), lx=W+1,
                               ly=H, fill=rgb_color_alpha(0, 0, 0, 1))
     background.draw(surface)
 
