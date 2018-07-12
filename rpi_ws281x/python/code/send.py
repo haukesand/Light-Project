@@ -12,7 +12,7 @@ from itertools import *
 from tendo import singleton
 me = singleton.SingleInstance() # will sys.exit(-1) if other instance is running
 # LED strip configuration:
-LED_1_COUNT = 54      # Number of LED pixels.
+LED_1_COUNT = 55      # Number of LED pixels.
 # GPIO pin connected to the pixels (must support PWM! GPIO 13 and 18 on RPi 3).
 LED_1_PIN = 18
 LED_1_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
@@ -58,7 +58,7 @@ class Send(object):
             for i in range(54):
                 self.strip1.setPixelColor(i, wheel((int(i * 256 / 54) + j) & 255))
             self.strip1.show()
-            time.sleep(20/1000.0)
+            # time.sleep(20/1000.0)
 
 
         # settuppixel

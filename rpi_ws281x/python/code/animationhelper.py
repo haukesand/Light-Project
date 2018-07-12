@@ -74,7 +74,7 @@ def flank_light_pulse(t, xy1, xy2, color, duration):
     gradient = gz.ColorGradient("linear", ((0, tuple(i * strength for i in color)), (0.7, (0, 0, 0, 0))),
                                 xy1=xy1, xy2=xy2)
 
-    rect = gz.rectangle(xy=(halfW, halfH), lx=W, ly=H, fill=gradient)
+    rect = gz.rectangle(xy=(halfW, halfH), lx=W+1, ly=H, fill=gradient)
     rect.draw(surface)
 
 def light_pulsate(t, color, duration):
@@ -84,7 +84,7 @@ def light_pulsate(t, color, duration):
         strength = 1.0 - easing.easeInQuart(t-duration * 1 / 3, 0.0, 1.0, duration * 1 / 3)
     else:
         strength = 0.0
-    rect = gz.rectangle(xy=(halfW, halfH), lx=W, ly=H, fill=tuple(i * strength for i in color))
+    rect = gz.rectangle(xy=(halfW, halfH), lx=W+1, ly=H, fill=tuple(i * strength for i in color))
     rect.draw(surface)
 
 def point_light_grow_shrink(t, size, xy, color):

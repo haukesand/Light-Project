@@ -36,15 +36,15 @@ class animation:
             self.function = "point_light_grow_shrink"
             self.function_nr = 1
             self.color = ah.rgb_color_alpha(253, 215, 15, 1)
-            self.position = (15, 30)
-            self.size = 140
+            self.position = (4, 5)
+            self.size = 30
         elif self.type == "turn_right":
             self.type_nr = 1
             self.function = "point_light_grow_shrink"
             self.function_nr = 1
             self.color = ah.rgb_color_alpha(253, 215, 15, 1)
-            self.position = (W - 15, 30)
-            self.size = 140
+            self.position = (W - 4, 5)
+            self.size = 30
         elif self.type == "start_moving":
             self.duration = 3.0
             self.type_nr = 2
@@ -68,7 +68,7 @@ class animation:
             self.function_nr = 2
             self.duration = 2.5
             self.posx = 0
-            self.size = 30
+            self.size = 8
             self.color = ah.rgb_color_alpha(255, 191, 0, 1)
         elif self.type == "lane_right":
             self.type_nr=5
@@ -76,7 +76,7 @@ class animation:
             self.function_nr = 2
             self.duration = 2.5
             self.posx = ah.W
-            self.size = 30
+            self.size = 8
             self.color = ah.rgb_color_alpha(255, 191, 0, 1)
         elif self.type == "depart_todestination":
             self.type_nr = 6
