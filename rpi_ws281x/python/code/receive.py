@@ -128,7 +128,7 @@ try:
                         strength = float(item[9:])
                     elif item.startswith('angle'):
                         angle = float(item[6:])
-                if light_type != "light_up":
+                if light_type != "light_up" and light_type != "idle":
                     # print light_type
                     if always_loop is not False or always_loop is None:
                         drawNow.new_animation(light_type=light_type, always_loop=always_loop,
@@ -136,7 +136,7 @@ try:
                     else:
                         drawNow.off_animation(light_type=light_type)
                 else:
-                    drawNow.set_light(always_loop)
+                    drawNow.set_light(light_type, always_loop)
 
         except IOError:
             client_sock, client_info = server_sock.accept()

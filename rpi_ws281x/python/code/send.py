@@ -33,6 +33,8 @@ class Send(object):
         self.t = 0
         self.w = 0
         self.lightFlag = False
+        self.idleFlag = False
+        self.rainbowJ = 0
         # Create NeoPixel objects with appropriate configuration for each strip.
         self.strip1 = Adafruit_NeoPixel(LED_1_COUNT, LED_1_PIN, LED_1_FREQ_HZ,
                                    LED_1_DMA, LED_1_INVERT, LED_1_BRIGHTNESS, LED_1_CHANNEL, LED_1_STRIP)
@@ -54,11 +56,11 @@ class Send(object):
         print ('Press Ctrl-C to quit.')
         
         #print some colors
-        for j in range(256*10):
+        for j in range(256):
             for i in range(54):
                 self.strip1.setPixelColor(i, wheel((int(i * 256 / 54) + j) & 255))
             self.strip1.show()
-            # time.sleep(20/1000.0)
+            time.sleep(20/1000.0)
 
 
         # settuppixel
@@ -75,15 +77,22 @@ class Send(object):
         self.strip1.show()
 
         while (self._is_running):
-            # if self.animation.get_light_on() == True and not self.lightFlag:
-            #     self.w = 30
-            #     self.whitein(self.strip1)
-            #     self.lightFlag = True
-            # elif self.lightFlag and not self.animation.get_light_on():
-            #     self.blackout(self.strip1)
-            #     self.w = 0
-            #     self.lightFlag = False
+            if self.animation.get_light_on() == True and not self.lightFlag:
+                self.w = 30
+                self.whitein(self.strip1)
+                self.lightFlag = True
+            elif self.lightFlag and not self.animation.get_light_on():
+                self.blackout(self.strip1)
+                self.w = 0
+                self.lightFlag = False
             
+            if self.animation.get_idle_light_on() == True and not self.idleFlag:
+
+
+                self.idleFlag = True
+            elif self.idleFlag and not self.animation.get_idle_light_on():
+                self.idleFlag = False
+
 
             # if self.animation.get_idle_light_on() == False:
             imDraw = self.animation.get_last_frame()
@@ -99,15 +108,35 @@ class Send(object):
                 r = int(data[1])
                 b = int(data[2])
                 g = int(data[3])
+
+                if self.lightFlag == True:
+
+                    r = g = b = self.w
+
+               
+
                 # w = self.w - r/2 + b/2 + g/2
                 # w = max(0, min(w, self.w)) # for whatever reason is this maximal a positive uint8
                 myColor = Color(r, b, g)
                 self.strip1.setPixelColor(int(id), myColor)
                
+                
+
                 # print "id: {0} r: {1} b: {2} g: {3}".format(id, r, b, g)
                 # print(np.around(compMapDraw,decimals=3))
 
-            self.strip1.show()
+            if self.idleFlag == True:
+                    for i in range(54):
+                        self.strip1.setPixelColor(i, wheel((int(i * 256 / 54) + self.rainbowJ) & 255))
+                    self.rainbowJ +=1
+                    time.sleep(20/1000.0)
+
+                    if self.rainbowJ > 256:
+                        self.rainbowJ =0
+                            
+            self.strip1.show() # render the calculated colors
+
+
             # else:
             #     for j in range(256*5):
             #         for i in range(54):

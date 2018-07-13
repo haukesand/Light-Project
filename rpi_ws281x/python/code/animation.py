@@ -186,6 +186,7 @@ class Draw(object):
         self._is_running = True
         self.last_frame = None  # numpy array of animations
         self.light_on = False
+        self.idle_light = False
         self.augmentation_on = True
         # self.display = i2c_display_class.Display()
 
@@ -316,14 +317,17 @@ class Draw(object):
                     one_animation.always_loop = False
                     # print one_animation.type + ": Turning off"
 
-    def set_light(self, onoff):
+    def set_light(self, light_type, onoff):
         # if onoff == True:
         #     self.display.write_line(1, "Hello!")
         #     self.display.write_line(2, "")
         # else:
         #     self.display.write_line(1, "Bye!")
         #     self.display.write_line(2, "")
-        self.light_on = onoff
+        if light_type == "light_up":
+            self.light_on = onoff
+        elif light_type == "idle": 
+            self.idle_light = onoff
 
     def toggle_user_light(self):
         self.light_on = not self.light_on
@@ -357,3 +361,5 @@ class Draw(object):
         return self.last_frame
     def get_light_on(self):
         return self.light_on
+    def get_idle_light_on(self):
+        return self.idle_light
