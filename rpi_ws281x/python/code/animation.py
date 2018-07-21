@@ -188,6 +188,21 @@ class Draw(object):
         self.light_on = False
         self.idle_light = False
         self.augmentation_on = True
+        
+        ## custom animation variables
+        self.ca_on = False
+        self.ca_time = 0.0
+
+        self.ca_type = "light_pulsate"
+        self.ca_size = 30
+        self.ca_duration = 2.0
+        self.ca_angle = 180
+        self.ca_direction = 0
+        self.ca_R = 118
+        self.ca_G = 238
+        self.ca_B = 0
+        self.ca_A = 255
+
         # self.display = i2c_display_class.Display()
 
         thread = threading.Thread(name='animation', target=self.draw, args=())
@@ -208,69 +223,108 @@ class Draw(object):
             display_reset_count = 0
             ah.background()  # clear background
 
-            for index, cur_animation in enumerate(animation_list, start=0):
-                # render individual animations here
+            if self.ca_on == False:
 
-                if cur_animation.fadein:
-                    cur_animation.color[3] += cur_animation.fadespeed
-                    if cur_animation.color[3] >= cur_animation.fadein:
-                        cur_animation.fadein = False
-                
-                # print len(animation_list) # take care that only one animation is in the list
-                
-                elif cur_animation.function_nr == 7:
-                    ah.light_pulsate(cur_animation.time, cur_animation.color, cur_animation.duration)
-                elif cur_animation.function_nr == 4:
-                    ah.multi_strip_light_through(
-                    cur_animation.time, cur_animation.angle, cur_animation.thickness, cur_animation.color, cur_animation.duration)
-                if cur_animation.function_nr == 1:
-                    ah.point_light_grow_shrink(
-                    cur_animation.time, cur_animation.size, cur_animation.position, cur_animation.color)
-                elif cur_animation.function_nr == 2:
-                    ah.point_light_through(
-                        cur_animation.time, cur_animation.size, cur_animation.posx, cur_animation.color, cur_animation.duration)
-                elif cur_animation.function_nr == 3:
-                    ah.strip_light_through(
+                for index, cur_animation in enumerate(animation_list, start=0):
+                    # render individual animations here
+
+                    if cur_animation.fadein:
+                        cur_animation.color[3] += cur_animation.fadespeed
+                        if cur_animation.color[3] >= cur_animation.fadein:
+                            cur_animation.fadein = False
+                    
+                    # print len(animation_list) # take care that only one animation is in the list
+                    
+                    elif cur_animation.function_nr == 7:
+                        ah.light_pulsate(cur_animation.time, cur_animation.color, cur_animation.duration)
+                    elif cur_animation.function_nr == 4:
+                        ah.multi_strip_light_through(
                         cur_animation.time, cur_animation.angle, cur_animation.thickness, cur_animation.color, cur_animation.duration)
-                elif cur_animation.function_nr == 5:
-                    ah.light_rotate_around(cur_animation.time, cur_animation.angle,
-                                           cur_animation.thickness, cur_animation.direction, cur_animation.color)
-                elif cur_animation.function_nr == 6:
+                    if cur_animation.function_nr == 1:
+                        ah.point_light_grow_shrink(
+                        cur_animation.time, cur_animation.size, cur_animation.position, cur_animation.color)
+                    elif cur_animation.function_nr == 2:
+                        ah.point_light_through(
+                            cur_animation.time, cur_animation.size, cur_animation.posx, cur_animation.color, cur_animation.duration)
+                    elif cur_animation.function_nr == 3:
+                        ah.strip_light_through(
+                            cur_animation.time, cur_animation.angle, cur_animation.thickness, cur_animation.color, cur_animation.duration)
+                    elif cur_animation.function_nr == 5:
+                        ah.light_rotate_around(cur_animation.time, cur_animation.angle,
+                                               cur_animation.thickness, cur_animation.direction, cur_animation.color)
+                    elif cur_animation.function_nr == 6:
+                        ah.flank_light_pulse(
+                            cur_animation.time, cur_animation.xy1, cur_animation.xy2, cur_animation.color, cur_animation.duration)
+                    
+
+
+                    if cur_animation.always_loop is not None and cur_animation.always_loop == False \
+                            or cur_animation.loop_time is not None and cur_animation.loop_time <= 0.0 \
+                            or cur_animation.loop_amount is not None and cur_animation.loop_amount <= 0:
+                        # TODO Implement Fadout
+                        # print np.average(cur_animation.color)
+                        if cur_animation.fadeout and np.average(cur_animation.color) >= cur_animation.fadespeed:
+                            cur_animation.color = np.subtract(cur_animation.color , cur_animation.fadespeed) # this is framerate dependent
+                        else:
+                            toDelete = index
+                            # print cur_animation.type + ": is deleted"
+
+                    cur_animation.time += loop_delta  # increase framerate independently
+                    if cur_animation.time >= cur_animation.duration:
+                        cur_animation.time = 0.0
+                        if cur_animation.loop_amount is not None:
+                            cur_animation.loop_amount -= 1
+                    if cur_animation.loop_time is not None:  # checl if loop number needs to be reduced
+                        cur_animation.loop_time -= loop_delta
+                    
+                    if cur_animation.always_loop is not None and cur_animation.always_loop == False \
+                            or cur_animation.loop_time is not None and cur_animation.loop_time <= 0.0 \
+                            or cur_animation.loop_amount is not None and cur_animation.loop_amount <= 0:
+                        # TODO Implement Fadout
+                        # print np.average(cur_animation.color)
+                        if cur_animation.fadeout and np.average(cur_animation.color) >= cur_animation.fadespeed:
+                            cur_animation.color = np.subtract(cur_animation.color , cur_animation.fadespeed) # this is framerate dependent
+                        else:
+                            toDelete = index
+                            # print cur_animation.type + ": is deleted"
+    
+            else:
+                ## draw a custom animation
+                if self.ca_type == "light_pulsate":
+                    ah.light_pulsate(
+                            self.ca_time, ah.rgb_color_alpha(self.ca_R, self.ca_G, self.ca_B, self.ca_A), self.ca_duration)
+                elif self.ca_type == "multi_strip_light_through":
+                    ah.multi_strip_light_through(
+                            self.ca_time, self.ca_angle, self.ca_size, ah.rgb_color_alpha(self.ca_R, self.ca_G, self.ca_B, self.ca_A), self.ca_duration)
+                elif self.ca_type == "point_light_grow_shrink":
+                    # different use of ca_size and ca_direction required
+                    ah.point_light_grow_shrink(
+                            self.ca_time, self.ca_size, (self.ca_direction,self.ca_angle), ah.rgb_color_alpha(self.ca_R, self.ca_G, self.ca_B, self.ca_A))
+                elif self.ca_type == "point_light_through":
+                    if self.ca_direction != 0:
+                        self.ca_direction = ah.W
+                    ah.point_light_through(
+                            self.ca_time, self.ca_size, self.ca_direction, ah.rgb_color_alpha(self.ca_R, self.ca_G, self.ca_B, self.ca_A), self.ca_duration)
+                elif self.ca_type == "strip_light_through":
+                    ah.strip_light_through(
+                            self.ca_time, self.ca_angle, self.ca_size, ah.rgb_color_alpha(self.ca_R, self.ca_G, self.ca_B, self.ca_A), self.ca_duration)
+                elif self.ca_type == "light_rotate_around":
+                    ah.light_rotate_around(
+                        self.ca_time, self.ca_angle, self.ca_size, self.ca_angle, ah.rgb_color_alpha(self.ca_R, self.ca_G, self.ca_B, self.ca_A))
+                elif self.ca_type == "flank_light_pulse":
+                    if self.ca_direction == 0:
+                        ca_xy1 = (ah.halfW, 0)
+                        ca_xy2 = (-ah.rightX, 0)
+                    else:
+                        ca_xy1 = (0, -ah.halfH)
+                        ca_xy2 = (0, ah.bottomY)
                     ah.flank_light_pulse(
-                        cur_animation.time, cur_animation.xy1, cur_animation.xy2, cur_animation.color, cur_animation.duration)
-                
+                            self.ca_time, ca_xy1, ca_xy2, ah.rgb_color_alpha(self.ca_R, self.ca_G, self.ca_B, self.ca_A), self.ca_duration)
 
+                self.ca_time += loop_delta  # increase framerate independently
+                if self.ca_time >= self.ca_duration:
+                    self.ca_time = 0.0    
 
-                if cur_animation.always_loop is not None and cur_animation.always_loop == False \
-                        or cur_animation.loop_time is not None and cur_animation.loop_time <= 0.0 \
-                        or cur_animation.loop_amount is not None and cur_animation.loop_amount <= 0:
-                    # TODO Implement Fadout
-                    # print np.average(cur_animation.color)
-                    if cur_animation.fadeout and np.average(cur_animation.color) >= cur_animation.fadespeed:
-                        cur_animation.color = np.subtract(cur_animation.color , cur_animation.fadespeed) # this is framerate dependent
-                    else:
-                        toDelete = index
-                        # print cur_animation.type + ": is deleted"
-
-                cur_animation.time += loop_delta  # increase framerate independently
-                if cur_animation.time >= cur_animation.duration:
-                    cur_animation.time = 0.0
-                    if cur_animation.loop_amount is not None:
-                        cur_animation.loop_amount -= 1
-                if cur_animation.loop_time is not None:  # checl if loop number needs to be reduced
-                    cur_animation.loop_time -= loop_delta
-                
-                if cur_animation.always_loop is not None and cur_animation.always_loop == False \
-                        or cur_animation.loop_time is not None and cur_animation.loop_time <= 0.0 \
-                        or cur_animation.loop_amount is not None and cur_animation.loop_amount <= 0:
-                    # TODO Implement Fadout
-                    # print np.average(cur_animation.color)
-                    if cur_animation.fadeout and np.average(cur_animation.color) >= cur_animation.fadespeed:
-                        cur_animation.color = np.subtract(cur_animation.color , cur_animation.fadespeed) # this is framerate dependent
-                    else:
-                        toDelete = index
-                        # print cur_animation.type + ": is deleted"
-            
             if toDelete is not None:  # turn off one animation each iteration
                 del animation_list[toDelete]
                 # if len(animation_list) == 0:
@@ -286,11 +340,38 @@ class Draw(object):
 
     def new_animation(self, light_type=None, always_loop=False, loop_amount=None, loop_time=None, strength=None, angle=None):
         # self.display.create_message(light_type)
+        self.ca_on = False
         if self.augmentation_on:
             animation_list.append(animation(light_type=light_type, always_loop=always_loop, loop_time=loop_time,
                                             loop_amount=loop_amount, strength=strength, angle=angle))
         # print light_type + ": Is new"
 
+    def custom_animation(self, light_type):
+        self.ca_on = True
+        self.ca_type = light_type
+    
+    def update_ca(self, size = None, duration = None, angle = None, direction = None):
+        self.ca_on = True
+
+        if size:
+            self.ca_size = size
+            print self.ca_size
+        if duration:
+            self.ca_duration = duration 
+            print self.ca_duration
+        if angle:
+            self.ca_angle = angle
+            print self.ca_angle
+        if direction:
+            self.ca_direction = direction
+            print self.ca_direction
+       
+    def color_ca(self, R=None,G= None,B=None,A= None ):
+        self.ca_on = True
+        self.ca_R = R
+        self.ca_G = G
+        self.ca_B = B
+        self.ca_A = A
 
     # not yet implemented from sending side (changing strength and angle)
     def update_animation(self, light_type=None, always_loop=False, loop_amount=None, loop_time=None, strength=None, angle=None):

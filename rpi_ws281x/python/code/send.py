@@ -110,8 +110,8 @@ class Send(object):
                 g = int(data[3])
 
                 if self.lightFlag == True:
-
-                    r = g = b = self.w
+                    if r == g == b == 0:
+                        r = g = b = self.w
 
                
 
@@ -161,7 +161,7 @@ class Send(object):
         for n in range (self.w):
             w = n
             for i in range(LED_1_COUNT):
-                strip1.setPixelColor(i, Color(125, 125, 125))
+                strip1.setPixelColor(i, Color(self.w, self.w, self.w))
                 strip1.show()
 
         return self.surface.get_npimage()
